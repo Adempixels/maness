@@ -1,0 +1,1120 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>MA NESS — Catalogue</title>
+
+<style>
+:root{
+--rose:#f7c6d7;
+--rose2:#fde3ee;
+--gold:#c9ad6a;
+--ink:#1e0f1a;
+--muted:#6a5164;
+--card: rgba(255,255,255,.86);
+--glass: rgba(255,255,255,.30);
+--line: rgba(255,255,255,.45);
+--shadow: 0 18px 60px rgba(0,0,0,.12);
+--r: 22px;
+}
+*{box-sizing:border-box}
+body{
+margin:0;
+font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+color: var(--ink);
+overflow-x:hidden;
+background: linear-gradient(180deg, var(--rose2), #fff);
+}
+
+/* ✅ FOND CLAIR + IMAGE + ANIM DOUCE (PAS NOIR) */
+.bg{
+position: fixed;
+inset:0;
+z-index:-3;
+background:
+radial-gradient(1200px 800px at 15% 10%, rgba(255,255,255,.92), transparent 60%),
+radial-gradient(900px 700px at 85% 10%, rgba(247,198,215,.50), transparent 55%),
+radial-gradient(900px 700px at 60% 85%, rgba(201,173,106,.18), transparent 55%),
+url("https://images.unsplash.com/photo-1548013146-72479768bada?auto=format&fit=crop&w=2400&q=80")
+center/cover no-repeat;
+filter: saturate(1.05) contrast(1.02);
+transform: scale(1.05);
+animation: bgMove 18s ease-in-out infinite alternate;
+}
+@keyframes bgMove{
+from{ transform: scale(1.05) translate3d(0,0,0); }
+to{ transform: scale(1.08) translate3d(-1.2%, -0.8%, 0); }
+}
+
+/* Brume rose très légère */
+.mist{
+position: fixed;
+inset:-20%;
+z-index:-2;
+background:
+radial-gradient(circle at 25% 35%, rgba(255,255,255,.35), transparent 55%),
+radial-gradient(circle at 70% 45%, rgba(255,255,255,.25), transparent 60%),
+radial-gradient(circle at 50% 75%, rgba(255,255,255,.22), transparent 60%);
+filter: blur(26px);
+opacity:.55;
+animation: mist 14s ease-in-out infinite alternate;
+pointer-events:none;
+}
+@keyframes mist{
+from{ transform: translate3d(-1.5%, -1%, 0); opacity:.45; }
+to{ transform: translate3d(1.5%, 1%, 0); opacity:.62; }
+}
+
+/* Intro (5 secondes) */
+.intro{
+position: fixed;
+inset:0;
+z-index:50;
+display:flex;
+align-items:center;
+justify-content:center;
+background: rgba(255,255,255,.55);
+backdrop-filter: blur(10px);
+transition: opacity .9s ease, visibility .9s ease;
+}
+.intro.hide{ opacity:0; visibility:hidden; }
+.introCard{
+width:min(560px, 92vw);
+border-radius: 28px;
+background: rgba(255,255,255,.70);
+border: 1px solid rgba(255,255,255,.75);
+padding: 26px 20px;
+box-shadow: 0 24px 80px rgba(0,0,0,.14);
+text-align:center;
+}
+.brandAnim{
+font-weight: 950;
+letter-spacing: .28em;
+font-size: 34px;
+color: #5c2a4f;
+animation: float 2.6s ease-in-out infinite;
+}
+@keyframes float{ 0%,100%{transform:translateY(0)} 50%{transform:translateY(-6px)} }
+.introLine{
+height:2px;
+width: 260px;
+max-width: 80%;
+margin: 16px auto 10px;
+background: linear-gradient(90deg, transparent, rgba(201,173,106,.95), transparent);
+border-radius: 99px;
+}
+.introText{
+color: rgba(92,42,79,.75);
+letter-spacing: .16em;
+font-size: 12px;
+font-weight: 800;
+}
+
+.wrap{
+width:min(1200px, 94vw);
+margin: 18px auto 120px;
+position: relative;
+z-index: 1;
+}
+
+.topbar{
+display:flex;
+align-items:center;
+justify-content:space-between;
+gap:12px;
+padding: 14px;
+border-radius: 22px;
+background: rgba(255,255,255,.55);
+border: 1px solid rgba(255,255,255,.75);
+backdrop-filter: blur(10px);
+box-shadow: var(--shadow);
+}
+.brand{
+display:flex;
+align-items:center;
+gap:12px;
+min-width: 220px;
+}
+.badge{
+width:52px;
+height:52px;
+border-radius: 18px;
+display:flex;
+align-items:center;
+justify-content:center;
+font-weight: 1000;
+letter-spacing:.12em;
+background: linear-gradient(135deg, rgba(253,227,238,.9), rgba(201,173,106,.45));
+border: 1px solid rgba(255,255,255,.8);
+}
+.brandTitle b{
+display:block;
+letter-spacing:.22em;
+color:#5c2a4f;
+font-size: 14px;
+}
+.brandTitle span{
+font-size: 12px;
+color: rgba(92,42,79,.65);
+}
+
+button{
+border:0;
+cursor:pointer;
+font-weight: 900;
+border-radius: 16px;
+padding: 10px 14px;
+transition: transform .12s ease, filter .12s ease;
+font-family: inherit;
+}
+button:hover{ transform: translateY(-1px); filter: brightness(1.02); }
+.btn{
+background: linear-gradient(90deg, rgba(247,198,215,.95), rgba(201,173,106,.70));
+color:#2a1024;
+}
+.btn2{
+background: rgba(255,255,255,.70);
+border: 1px solid rgba(255,255,255,.75);
+color:#5c2a4f;
+}
+
+.hero{
+margin-top: 14px;
+padding: 18px;
+border-radius: 26px;
+background: rgba(255,255,255,.55);
+border: 1px solid rgba(255,255,255,.75);
+backdrop-filter: blur(10px);
+box-shadow: var(--shadow);
+}
+.hero h1{
+margin:0;
+color:#5c2a4f;
+letter-spacing:.06em;
+font-size: clamp(24px, 3.2vw, 40px);
+}
+.hero p{
+margin:10px 0 0;
+color: rgba(92,42,79,.75);
+line-height:1.55;
+max-width: 76ch;
+}
+.pill{
+display:inline-block;
+margin-top: 12px;
+padding: 8px 12px;
+border-radius: 999px;
+background: rgba(255,255,255,.60);
+border: 1px solid rgba(255,255,255,.75);
+color: rgba(92,42,79,.78);
+font-size: 12px;
+font-weight: 850;
+letter-spacing:.05em;
+}
+
+.catalog{
+margin-top: 14px;
+padding: 18px;
+border-radius: 26px;
+background: rgba(255,255,255,.55);
+border: 1px solid rgba(255,255,255,.75);
+backdrop-filter: blur(10px);
+box-shadow: var(--shadow);
+}
+.catalogTop{
+display:flex;
+align-items:center;
+justify-content:space-between;
+gap:10px;
+flex-wrap:wrap;
+}
+.catalogTop h2{
+margin:0;
+color:#5c2a4f;
+letter-spacing:.14em;
+font-size: 15px;
+}
+.count{ color: rgba(92,42,79,.70); font-size: 12px; font-weight: 800; }
+
+.filters{
+display:flex;
+gap:10px;
+flex-wrap:wrap;
+margin-top: 12px;
+}
+input, select, textarea{
+border-radius: 16px;
+border: 1px solid rgba(255,255,255,.80);
+background: rgba(255,255,255,.78);
+color: #2a1024;
+padding: 10px 12px;
+outline:none;
+font-family: inherit;
+}
+input::placeholder, textarea::placeholder{ color: rgba(42,16,36,.50); }
+select option{ color:#111; background:#fff; }
+.filters > *{ flex: 1; min-width: 190px; }
+
+.products{
+margin-top: 14px;
+display:grid;
+grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+gap: 14px;
+}
+.card{
+background: rgba(255,255,255,.88);
+border: 1px solid rgba(255,255,255,.80);
+border-radius: 22px;
+overflow:hidden;
+box-shadow: 0 16px 40px rgba(0,0,0,.10);
+}
+.cover{
+position:relative;
+height: 230px;
+background: linear-gradient(135deg, rgba(247,198,215,.75), rgba(201,173,106,.50));
+display:flex; align-items:center; justify-content:center;
+}
+.cover img{ width:100%; height:100%; object-fit: cover; display:block; }
+.tag{
+position:absolute; left:12px; top:12px;
+padding: 7px 10px;
+border-radius: 999px;
+font-size: 12px;
+font-weight: 950;
+background: rgba(255,255,255,.88);
+border: 1px solid rgba(0,0,0,.06);
+color:#5c2a4f;
+}
+.photos{
+position:absolute; right:12px; bottom:12px;
+padding: 6px 10px;
+border-radius: 999px;
+font-size: 12px;
+font-weight: 950;
+background: rgba(255,255,255,.88);
+border: 1px solid rgba(0,0,0,.06);
+color:#2a1024;
+}
+.body{ padding: 14px; }
+.name{ margin:0; font-weight: 950; color:#2a1024; }
+.meta{ margin:6px 0 0; color: rgba(92,42,79,.70); font-size: 12px; font-weight: 800; }
+.desc{ margin:10px 0 0; color:#2a1024; font-size: 13px; line-height:1.45; }
+.price{ margin:10px 0 0; font-weight: 1000; color:#b38d2f; }
+.btns{ display:flex; gap:10px; margin-top:12px; flex-wrap:wrap; }
+.mini{ padding:10px 12px; border-radius: 14px; font-weight: 950; }
+.mini.wa{ background: linear-gradient(90deg, rgba(247,198,215,.95), rgba(201,173,106,.70)); color:#2a1024; }
+.mini.view{ background:#fff; border:1px solid rgba(0,0,0,.08); color:#5c2a4f; }
+
+/* Admin FAB */
+.adminFab{
+position: fixed;
+right: 16px;
+bottom: 16px;
+z-index: 30;
+width: 54px;
+height: 54px;
+border-radius: 20px;
+background: rgba(255,255,255,.65);
+border: 1px solid rgba(255,255,255,.85);
+box-shadow: 0 18px 55px rgba(0,0,0,.16);
+display:flex;
+align-items:center;
+justify-content:center;
+cursor:pointer;
+}
+.adminFab::before{
+content:"";
+position:absolute;
+inset:-10px;
+border-radius: 22px;
+background: radial-gradient(circle, rgba(201,173,106,.30), transparent 60%);
+opacity:.70;
+animation: pulse 2.4s ease-in-out infinite;
+z-index:-1;
+}
+@keyframes pulse{
+0%,100%{ transform: scale(.96); opacity:.50; }
+50%{ transform: scale(1.05); opacity:.92; }
+}
+.adminFab span{ font-weight: 1000; color:#5c2a4f; }
+
+/* Modals */
+.modal{
+position:fixed; inset:0;
+background: rgba(0,0,0,.45);
+z-index: 60;
+display:flex; align-items:center; justify-content:center;
+padding: 16px;
+}
+.modal.hidden{ display:none; }
+
+.modalCard{
+width: min(980px, 96vw);
+background: rgba(255,255,255,.94);
+border: 1px solid rgba(255,255,255,.85);
+border-radius: 26px;
+box-shadow: 0 24px 80px rgba(0,0,0,.24);
+overflow:hidden;
+max-height: 90vh;
+overflow-y: auto;
+}
+.modalHead{
+display:flex; justify-content:space-between; align-items:center; gap:10px;
+padding: 14px 16px;
+background: linear-gradient(90deg, rgba(247,198,215,.95), rgba(201,173,106,.70));
+color:#2a1024;
+}
+.modalHead b{ letter-spacing:.10em; }
+.closeBtn{
+background: rgba(255,255,255,.85);
+border: 1px solid rgba(0,0,0,.10);
+color:#2a1024;
+padding: 10px 12px;
+border-radius: 14px;
+font-weight: 1000;
+}
+.modalBody{ padding: 16px; }
+
+/* Galerie */
+.galleryMain{
+height: min(62vh, 520px);
+border-radius: 18px;
+overflow:hidden;
+background: #fff;
+border: 1px solid rgba(0,0,0,.08);
+display:flex; align-items:center; justify-content:center;
+}
+.galleryMain img{ width:100%; height:100%; object-fit:contain; }
+.strip{ margin-top:12px; display:flex; gap:10px; flex-wrap:wrap; }
+.thumb{
+width: 86px; height: 86px;
+border-radius: 16px;
+overflow:hidden;
+border: 2px solid transparent;
+cursor:pointer;
+background:#fff;
+}
+.thumb.active{ border-color: var(--gold); }
+.thumb img{ width:100%; height:100%; object-fit:cover; display:block; }
+
+/* Admin */
+.adminGrid{ display:grid; grid-template-columns: 1fr 1fr; gap:12px; }
+@media(max-width:900px){ .adminGrid{ grid-template-columns:1fr; } }
+.adminBox{
+background:#fff;
+border: 1px solid rgba(0,0,0,.08);
+border-radius: 22px;
+padding: 14px;
+box-shadow: 0 16px 42px rgba(0,0,0,.10);
+}
+.adminBox h3{ margin:0 0 10px; letter-spacing:.08em; color:#5c2a4f; }
+.adminRow{ display:flex; gap:10px; flex-wrap:wrap; }
+.adminRow > *{ flex:1; min-width: 200px; }
+
+.hint{
+margin-top: 10px;
+padding: 10px 12px;
+border-radius: 16px;
+background: linear-gradient(90deg, rgba(247,198,215,.55), rgba(201,173,106,.20));
+border: 1px solid rgba(0,0,0,.06);
+color: rgba(42,16,36,.85);
+font-size: 13px;
+line-height: 1.35;
+}
+
+.thumbsAdmin{ display:flex; gap:10px; flex-wrap:wrap; margin-top:10px; }
+.thumbA{
+width: 92px; height: 92px;
+border-radius: 16px;
+overflow:hidden;
+border: 1px solid rgba(0,0,0,.10);
+position:relative;
+background:#fff;
+cursor:pointer;
+}
+.thumbA img{ width:100%; height:100%; object-fit:cover; display:block; }
+.thumbA .x{
+position:absolute; top:6px; right:6px;
+width: 22px; height: 22px;
+border-radius: 50%;
+background: rgba(255,255,255,.92);
+border: 1px solid rgba(0,0,0,.10);
+display:flex; align-items:center; justify-content:center;
+font-weight: 1000;
+}
+.thumbA .coverTag{
+position:absolute; left:6px; bottom:6px;
+padding: 4px 8px;
+border-radius: 999px;
+background: rgba(255,255,255,.92);
+border: 1px solid rgba(0,0,0,.10);
+font-size: 11px;
+font-weight: 1000;
+}
+
+table{
+width:100%;
+border-collapse:collapse;
+margin-top: 12px;
+overflow:hidden;
+border-radius: 16px;
+border: 1px solid rgba(0,0,0,.08);
+}
+th, td{ padding: 10px; border-bottom: 1px solid rgba(0,0,0,.06); font-size: 13px; vertical-align:top; text-align:left; }
+th{ background: rgba(247,198,215,.45); font-weight: 1000; color:#5c2a4f; letter-spacing:.04em; }
+tr:last-child td{ border-bottom:0; }
+.rowBtns{ display:flex; gap:8px; flex-wrap:wrap; }
+.btnSmall{
+padding: 8px 10px;
+border-radius: 14px;
+font-weight: 1000;
+border: 1px solid rgba(0,0,0,.10);
+background:#fff;
+cursor:pointer;
+}
+.btnSmall.danger{
+background: linear-gradient(90deg, rgba(255,120,120,.95), rgba(255,195,195,.92));
+border: 0;
+}
+</style>
+
+<!-- Firebase compat (OK GitHub Pages) -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+</head>
+
+<body>
+<div class="bg"></div>
+<div class="mist"></div>
+
+<!-- ✅ INTRO 5s puis disparaît -->
+<div class="intro" id="intro">
+<div class="introCard">
+<div class="brandAnim">MA NESS</div>
+<div class="introLine"></div>
+<div class="introText">ABAYA COLLECTION • ALGÉRIE</div>
+</div>
+</div>
+
+<div class="wrap">
+<div class="topbar">
+<div class="brand">
+<div class="badge">MN</div>
+<div class="brandTitle">
+<b>MA NESS</b>
+<span>Paiement sur place • Catalogue en ligne</span>
+</div>
+</div>
+<div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end;">
+<button class="btn2" onclick="openEmail()">✉️ Email</button>
+<button class="btn" onclick="openWhatsApp()">WhatsApp</button>
+</div>
+</div>
+
+<section class="hero">
+<h1>Bienvenue dans MA NESS</h1>
+<p>
+Catalogue élégant, contact direct sur WhatsApp, paiement sur place.
+<b>Livraison : Ouled Rechache + villes proches</b>.
+</p>
+<div class="pill">🚚 Livraison proche • 📲 WhatsApp direct • 💳 Paiement sur place</div>
+</section>
+
+<section class="catalog">
+<div class="catalogTop">
+<h2>CATALOGUE</h2>
+<div class="count" id="countText">—</div>
+</div>
+
+<div class="filters">
+<input id="search" placeholder="Rechercher (nom, description, référence)..." />
+<select id="cat"><option value="all">Toutes catégories</option></select>
+<select id="size"><option value="all">Toutes tailles</option></select>
+<select id="sort">
+<option value="new">Nouveautés</option>
+<option value="priceAsc">Prix (croissant)</option>
+<option value="priceDesc">Prix (décroissant)</option>
+</select>
+<button class="btn2" onclick="resetFilters()">Réinitialiser</button>
+</div>
+
+<div class="products" id="products">Chargement…</div>
+</section>
+</div>
+
+<!-- Admin -->
+<div class="adminFab" id="adminFab" title="Espace gestion"><span>✦</span></div>
+
+<!-- Galerie -->
+<div class="modal hidden" id="galleryModal">
+<div class="modalCard">
+<div class="modalHead">
+<div>
+<b id="gTitle">Photos</b>
+<div style="font-size:12px;opacity:.85" id="gSub"></div>
+</div>
+<button class="closeBtn" onclick="closeGallery()">Fermer</button>
+</div>
+<div class="modalBody">
+<div class="galleryMain"><img id="gMain" alt="Photo"></div>
+<div class="strip" id="gStrip"></div>
+</div>
+</div>
+</div>
+
+<!-- Admin login -->
+<div class="modal hidden" id="adminLoginModal">
+<div class="modalCard" style="width:min(520px,96vw);">
+<div class="modalHead">
+<b>ESPACE GESTION</b>
+<button class="closeBtn" onclick="closeAdminLogin()">Fermer</button>
+</div>
+<div class="modalBody">
+<div class="adminBox">
+<div style="font-weight:1000;margin-bottom:6px;">Mot de passe admin</div>
+<input id="adminPass" type="password" placeholder="Mot de passe">
+<div style="height:10px;"></div>
+<button class="btn" onclick="loginAdmin()">Connexion</button>
+<div class="hint">Si tu veux changer le mot de passe, modifie la variable <b>ADMIN_PASSWORD</b> dans le code.</div>
+</div>
+</div>
+</div>
+</div>
+
+<!-- Admin panel -->
+<div class="modal hidden" id="adminPanelModal">
+<div class="modalCard">
+<div class="modalHead">
+<b>GESTION PRODUITS</b>
+<button class="closeBtn" onclick="closeAdminPanel()">Fermer</button>
+</div>
+<div class="modalBody">
+<div class="adminGrid">
+<div class="adminBox">
+<h3>Ajouter / Modifier</h3>
+
+<div class="adminRow">
+<div>
+<div style="font-size:12px;color:var(--muted);font-weight:1000">Nom</div>
+<input id="pName" placeholder="Ex: Abaya satin rose">
+</div>
+<div>
+<div style="font-size:12px;color:var(--muted);font-weight:1000">Prix (DZD)</div>
+<input id="pPrice" type="number" placeholder="Ex: 6800">
+</div>
+</div>
+
+<div class="adminRow" style="margin-top:10px;">
+<div>
+<div style="font-size:12px;color:var(--muted);font-weight:1000">Catégorie</div>
+<input id="pCategory" placeholder="Ex: Abayas">
+</div>
+<div>
+<div style="font-size:12px;color:var(--muted);font-weight:1000">Référence (optionnel)</div>
+<input id="pRef" placeholder="Ex: MN-001">
+</div>
+</div>
+
+<div style="margin-top:10px;">
+<div style="font-size:12px;color:var(--muted);font-weight:1000">Tailles (séparées par virgule)</div>
+<input id="pSizes" placeholder="Ex: S,M,L">
+</div>
+
+<div style="margin-top:10px;">
+<div style="font-size:12px;color:var(--muted);font-weight:1000">Photos depuis votre appareil (plusieurs)</div>
+<input id="pImages" type="file" accept="image/*" multiple>
+<div class="thumbsAdmin" id="thumbsAdmin"></div>
+</div>
+
+<div style="margin-top:10px;">
+<div style="font-size:12px;color:var(--muted);font-weight:1000">Description</div>
+<textarea id="pDesc" placeholder="Détails (matière, couleur, etc.)"></textarea>
+</div>
+
+<div style="display:flex;justify-content:flex-end;gap:10px;flex-wrap:wrap;margin-top:10px;">
+<div id="editHint" style="margin-right:auto;font-weight:1000;color:rgba(0,0,0,.65)"></div>
+<button class="btn2" onclick="clearForm()">Effacer</button>
+<button class="btn" onclick="saveProduct()">Enregistrer</button>
+</div>
+
+<div class="hint">Version gratuite (Realtime DB) : max <b>6 photos</b>, max <b>800 Ko</b> / photo.</div>
+</div>
+
+<div class="adminBox">
+<h3>Liste des produits</h3>
+<table>
+<thead>
+<tr>
+<th>Nom</th><th>Prix</th><th>Cat.</th><th>Photos</th><th>Actions</th>
+</tr>
+</thead>
+<tbody id="adminTable"><tr><td colspan="5">Chargement…</td></tr></tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+<script>
+/* ===== CONTACT ===== */
+const SHOP_PHONE = "";
+const SHOP_EMAIL = "";
+const DELIVERY_TEXT = "Livraison : Ouled Rechache + villes proches. Paiement sur place.";
+
+/* ===== ADMIN ===== */
+const ADMIN_PASSWORD = "MN@Ness#7281";
+
+/* ✅ INTRO 5s */
+setTimeout(()=> document.getElementById("intro").classList.add("hide"), 5000);
+
+/* ===== Firebase config (compat) ===== */
+const firebaseConfig = {
+apiKey: "AIzaSyCQf9NiEsz9-_Bv_OE9GsxjvKBCD1CFMXs",
+authDomain: "manes-site.firebaseapp.com",
+databaseURL: "https://manes-site-default-rtdb.europe-west1.firebasedatabase.app",
+projectId: "manes-site",
+storageBucket: "manes-site.firebasestorage.app",
+messagingSenderId: "170716879590",
+appId: "1:170716879590:web:375cdada3c51a5809a7927",
+measurementId: "G-22J6LF9NH1"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+const productsRef = db.ref("products");
+
+/* ===== Utils ===== */
+const MAX_IMAGES = 6;
+const MAX_BYTES_PER_IMAGE = 800 * 1024;
+
+function openWhatsApp(prefill){
+const msg = prefill ? ("?text=" + encodeURIComponent(prefill)) : "";
+window.open("https://wa.me/" + SHOP_PHONE + msg, "_blank");
+}
+function openEmail(){ window.location.href = "mailto:" + SHOP_EMAIL; }
+function esc(s){
+return String(s ?? "").replace(/[&<>"']/g, m => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;" }[m]));
+}
+function dzd(n){ return Number(n||0).toLocaleString("fr-FR") + " DZD"; }
+function parseSizes(s){ return String(s||"").split(",").map(x=>x.trim()).filter(Boolean); }
+function unique(arr){ return Array.from(new Set(arr)); }
+
+/* ===== Catalogue state ===== */
+let ALL = [];
+const productsBox = document.getElementById("products");
+const countText = document.getElementById("countText");
+const searchEl = document.getElementById("search");
+const catEl = document.getElementById("cat");
+const sizeEl = document.getElementById("size");
+const sortEl = document.getElementById("sort");
+
+function isNew(createdAt){
+const days = 5;
+return createdAt && (Date.now() - createdAt) < (days*24*60*60*1000);
+}
+
+function buildFilterOptions(){
+const cats = unique(ALL.map(p=>p.category).filter(Boolean)).sort((a,b)=>a.localeCompare(b,"fr"));
+const sizes = unique(ALL.flatMap(p=>Array.isArray(p.sizes)?p.sizes:[]).filter(Boolean)).sort();
+
+const prevCat = catEl.value || "all";
+const prevSize = sizeEl.value || "all";
+
+catEl.innerHTML = `<option value="all">Toutes catégories</option>` + cats.map(c=>`<option value="${esc(c)}">${esc(c)}</option>`).join("");
+sizeEl.innerHTML = `<option value="all">Toutes tailles</option>` + sizes.map(s=>`<option value="${esc(s)}">${esc(s)}</option>`).join("");
+
+if([...catEl.options].some(o=>o.value===prevCat)) catEl.value = prevCat;
+if([...sizeEl.options].some(o=>o.value===prevSize)) sizeEl.value = prevSize;
+}
+
+function getFiltered(){
+const q = (searchEl.value||"").trim().toLowerCase();
+const cat = catEl.value;
+const size = sizeEl.value;
+const sort = sortEl.value;
+
+let list = ALL.slice();
+if(q){
+list = list.filter(p =>
+(p.name||"").toLowerCase().includes(q) ||
+(p.description||"").toLowerCase().includes(q) ||
+(p.ref||"").toLowerCase().includes(q)
+);
+}
+if(cat !== "all") list = list.filter(p => p.category === cat);
+if(size !== "all") list = list.filter(p => (p.sizes||[]).includes(size));
+
+if(sort === "priceAsc") list.sort((a,b)=>(a.priceDZD||0)-(b.priceDZD||0));
+else if(sort === "priceDesc") list.sort((a,b)=>(b.priceDZD||0)-(a.priceDZD||0));
+else list.sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
+
+return list;
+}
+
+function renderCatalogue(){
+const list = getFiltered();
+countText.textContent = `${list.length} article(s)`;
+
+if(!list.length){
+productsBox.innerHTML = `<div style="color:rgba(92,42,79,.75);font-weight:900">Aucun produit trouvé.</div>`;
+return;
+}
+
+productsBox.innerHTML = list.map(p=>{
+const images = Array.isArray(p.images)?p.images:[];
+const cover = images[0] || "";
+const sizes = Array.isArray(p.sizes)?p.sizes:[];
+const msg = `Salam, je suis intéressé(e) par : ${p.name}\nPrix: ${p.priceDZD} DZD\n${p.ref?("Réf: "+p.ref+"\n"):""}${DELIVERY_TEXT}`;
+
+return `
+<div class="card">
+<div class="cover">
+${cover ? `<img src="${esc(cover)}" alt="${esc(p.name)}" />` : `<div style="font-weight:1000;color:#5c2a4f">Photo</div>`}
+${isNew(p.createdAt) ? `<div class="tag">Nouveau</div>` : ``}
+${images.length>1 ? `<div class="photos">📷 ${images.length}</div>` : ``}
+</div>
+<div class="body">
+<h3 class="name">${esc(p.name)}</h3>
+<div class="meta">${esc(p.category||"")} ${p.ref ? `• Réf: ${esc(p.ref)}` : ""}</div>
+<div class="meta">Tailles: <b>${esc(sizes.join(", ") || "—")}</b></div>
+<div class="desc">${esc(p.description||"")}</div>
+<div class="price">${dzd(p.priceDZD)}</div>
+<div class="btns">
+<button class="mini wa" onclick="openWhatsApp(${JSON.stringify(msg)})">WhatsApp</button>
+${images.length ? `<button class="mini view" onclick="openGallery('${p.key}')">Voir photos</button>` : ``}
+</div>
+</div>
+</div>
+`;
+}).join("");
+}
+
+function resetFilters(){
+searchEl.value="";
+catEl.value="all";
+sizeEl.value="all";
+sortEl.value="new";
+renderCatalogue();
+}
+
+searchEl.addEventListener("input", renderCatalogue);
+catEl.addEventListener("change", renderCatalogue);
+sizeEl.addEventListener("change", renderCatalogue);
+sortEl.addEventListener("change", renderCatalogue);
+
+/* ===== Galerie ===== */
+const galleryModal = document.getElementById("galleryModal");
+const gTitle = document.getElementById("gTitle");
+const gSub = document.getElementById("gSub");
+const gMain = document.getElementById("gMain");
+const gStrip = document.getElementById("gStrip");
+
+function openGallery(key){
+const p = ALL.find(x=>x.key===key);
+if(!p) return;
+const images = Array.isArray(p.images)?p.images:[];
+if(!images.length) return;
+
+gTitle.textContent = p.name || "Photos";
+gSub.textContent = `${dzd(p.priceDZD)} • ${images.length} photo(s)`;
+gMain.src = images[0];
+renderStrip(images, 0);
+galleryModal.classList.remove("hidden");
+}
+function renderStrip(images, active){
+gStrip.innerHTML = images.map((src,i)=>`
+<div class="thumb ${i===active?'active':''}" data-i="${i}">
+<img src="${esc(src)}" alt="photo ${i+1}">
+</div>
+`).join("");
+
+gStrip.querySelectorAll(".thumb").forEach(el=>{
+el.addEventListener("click", ()=>{
+const i = Number(el.getAttribute("data-i"));
+gMain.src = images[i];
+renderStrip(images, i);
+});
+});
+}
+function closeGallery(){
+galleryModal.classList.add("hidden");
+gMain.src="";
+gStrip.innerHTML="";
+}
+galleryModal.addEventListener("click", (e)=>{ if(e.target===galleryModal) closeGallery(); });
+
+/* ===== Admin ===== */
+const adminFab = document.getElementById("adminFab");
+const adminLoginModal = document.getElementById("adminLoginModal");
+const adminPanelModal = document.getElementById("adminPanelModal");
+const adminPass = document.getElementById("adminPass");
+
+adminFab.addEventListener("click", ()=>{
+adminPass.value="";
+adminLoginModal.classList.remove("hidden");
+setTimeout(()=>adminPass.focus(), 60);
+});
+function closeAdminLogin(){ adminLoginModal.classList.add("hidden"); }
+function closeAdminPanel(){ adminPanelModal.classList.add("hidden"); }
+
+adminLoginModal.addEventListener("click", (e)=>{ if(e.target===adminLoginModal) closeAdminLogin(); });
+adminPanelModal.addEventListener("click", (e)=>{ if(e.target===adminPanelModal) closeAdminPanel(); });
+
+function loginAdmin(){
+if(adminPass.value === ADMIN_PASSWORD){
+closeAdminLogin();
+adminPanelModal.classList.remove("hidden");
+renderAdminTable();
+}else{
+alert("Mot de passe incorrect");
+}
+}
+
+/* Admin form */
+let EDIT_KEY = null;
+let existingImages = [];
+let removedExisting = new Set();
+let newImages = [];
+
+const pName = document.getElementById("pName");
+const pPrice = document.getElementById("pPrice");
+const pCategory = document.getElementById("pCategory");
+const pRef = document.getElementById("pRef");
+const pSizes = document.getElementById("pSizes");
+const pImages = document.getElementById("pImages");
+const pDesc = document.getElementById("pDesc");
+const thumbsAdmin = document.getElementById("thumbsAdmin");
+const editHint = document.getElementById("editHint");
+const adminTable = document.getElementById("adminTable");
+
+function clearImageState(){
+existingImages = [];
+removedExisting = new Set();
+newImages = [];
+pImages.value="";
+renderAdminThumbs();
+}
+function clearForm(){
+EDIT_KEY = null;
+pName.value=""; pPrice.value=""; pCategory.value=""; pRef.value="";
+pSizes.value=""; pDesc.value="";
+editHint.textContent="";
+clearImageState();
+}
+
+function fillForm(p){
+EDIT_KEY = p.key;
+pName.value = p.name||"";
+pPrice.value = p.priceDZD ?? "";
+pCategory.value = p.category||"";
+pRef.value = p.ref||"";
+pSizes.value = (p.sizes||[]).join(",");
+pDesc.value = p.description||"";
+editHint.textContent = "✏️ Modification : " + (p.name||"");
+
+existingImages = Array.isArray(p.images)?p.images.slice():[];
+removedExisting = new Set();
+newImages = [];
+pImages.value="";
+renderAdminThumbs();
+}
+
+function fileToDataURL(file){
+return new Promise((resolve,reject)=>{
+const r = new FileReader();
+r.onerror = ()=>reject(new Error("read error"));
+r.onload = ()=>resolve(r.result);
+r.readAsDataURL(file);
+});
+}
+function countAfter(){
+const kept = existingImages.filter((_,i)=>!removedExisting.has(i)).length;
+return kept + newImages.length;
+}
+
+pImages.addEventListener("change", async ()=>{
+const files = Array.from(pImages.files||[]);
+if(!files.length) return;
+
+let remaining = MAX_IMAGES - countAfter();
+if(remaining <= 0){
+alert(`Max ${MAX_IMAGES} photos. Retire une photo avant d’en ajouter.`);
+pImages.value="";
+return;
+}
+
+const toRead = files.slice(0, remaining);
+for(const f of toRead){
+if(f.size > MAX_BYTES_PER_IMAGE){
+alert(`Photo trop grande: "${f.name}". Max ${(MAX_BYTES_PER_IMAGE/1024).toFixed(0)} Ko.`);
+pImages.value="";
+return;
+}
+}
+
+const dataUrls = await Promise.all(toRead.map(fileToDataURL));
+newImages.push(...dataUrls);
+pImages.value="";
+renderAdminThumbs();
+});
+
+function renderAdminThumbs(){
+const keptExisting = existingImages
+.map((src,idx)=>({src, type:"existing", idx}))
+.filter(x=>!removedExisting.has(x.idx));
+const added = newImages.map((src,idx)=>({src, type:"new", idx}));
+const all = [...keptExisting, ...added];
+
+if(!all.length){
+thumbsAdmin.innerHTML = `<div style="font-size:12px;color:rgba(0,0,0,.55)">Aucune photo.</div>`;
+return;
+}
+
+thumbsAdmin.innerHTML = all.map((x,pos)=>`
+<div class="thumbA" data-type="${x.type}" data-idx="${x.idx}">
+<img src="${esc(x.src)}" alt="photo">
+<div class="x">×</div>
+<div class="coverTag">${pos===0 ? "Couverture" : "Mettre couverture"}</div>
+</div>
+`).join("");
+
+thumbsAdmin.querySelectorAll(".thumbA").forEach((el,pos)=>{
+el.addEventListener("click", ()=>{
+const type = el.getAttribute("data-type");
+const idx = Number(el.getAttribute("data-idx"));
+if(pos===0){ removeThumb(type, idx); }
+else{ makeCover(type, idx); }
+});
+});
+}
+function removeThumb(type, idx){
+if(type==="existing") removedExisting.add(idx);
+else newImages.splice(idx, 1);
+renderAdminThumbs();
+}
+function makeCover(type, idx){
+const keptExisting = existingImages.filter((_,i)=>!removedExisting.has(i));
+const keptNew = newImages.slice();
+let temp = [...keptExisting, ...keptNew];
+
+let targetSrc = (type==="existing") ? existingImages[idx] : newImages[idx];
+if(!targetSrc) return;
+
+temp = temp.filter(s => s !== targetSrc);
+temp.unshift(targetSrc);
+
+existingImages = temp;
+removedExisting = new Set();
+newImages = [];
+renderAdminThumbs();
+}
+
+function validateProduct(){
+const name = pName.value.trim();
+const category = pCategory.value.trim();
+const price = Number(pPrice.value);
+const ref = pRef.value.trim();
+const sizes = parseSizes(pSizes.value);
+const desc = pDesc.value.trim();
+if(!name) return {ok:false, msg:"Nom obligatoire"};
+if(!category) return {ok:false, msg:"Catégorie obligatoire"};
+if(!Number.isFinite(price) || price<=0) return {ok:false, msg:"Prix invalide"};
+return {ok:true, data:{name, category, priceDZD:price, ref, sizes, description:desc}};
+}
+
+function buildFinalImages(){
+const keptExisting = existingImages.filter((_,i)=>!removedExisting.has(i));
+return [...keptExisting, ...newImages].slice(0, MAX_IMAGES);
+}
+
+function saveProduct(){
+const v = validateProduct();
+if(!v.ok){ alert(v.msg); return; }
+
+const finalImages = buildFinalImages();
+if(finalImages.length===0){ alert("Ajoute au moins une photo."); return; }
+
+const existing = EDIT_KEY ? ALL.find(x=>x.key===EDIT_KEY) : null;
+const payload = { ...v.data, images: finalImages, createdAt: existing?.createdAt || Date.now() };
+
+if(EDIT_KEY){
+productsRef.child(EDIT_KEY).set(payload).then(()=>{
+alert("✅ Produit mis à jour !");
+clearForm();
+}).catch(err=>{ console.error(err); alert("❌ Erreur Firebase (rules ?)"); });
+}else{
+productsRef.push(payload).then(()=>{
+alert("✅ Produit ajouté !");
+clearForm();
+}).catch(err=>{ console.error(err); alert("❌ Erreur Firebase (rules ?)"); });
+}
+}
+
+function deleteProduct(key){
+if(!confirm("Supprimer ce produit ?")) return;
+productsRef.child(key).remove().catch(err=>{ console.error(err); alert("❌ Erreur suppression."); });
+}
+
+function renderAdminTable(){
+if(adminPanelModal.classList.contains("hidden")) return;
+const rows = ALL.slice().sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
+if(!rows.length){ adminTable.innerHTML = `<tr><td colspan="5">Aucun produit.</td></tr>`; return; }
+
+adminTable.innerHTML = rows.map(p=>{
+const photos = Array.isArray(p.images)?p.images.length:0;
+return `
+<tr>
+<td><b>${esc(p.name)}</b><div style="font-size:12px;color:rgba(0,0,0,.55)">${p.ref?("Réf: "+esc(p.ref)):""}</div></td>
+<td>${esc(dzd(p.priceDZD))}</td>
+<td>${esc(p.category||"")}</td>
+<td>${photos?("📷 "+photos):"—"}</td>
+<td>
+<div class="rowBtns">
+<button class="btnSmall" data-edit="${p.key}">Modifier</button>
+<button class="btnSmall danger" data-del="${p.key}">Supprimer</button>
+</div>
+</td>
+</tr>
+`;
+}).join("");
+
+adminTable.querySelectorAll("[data-edit]").forEach(btn=>{
+btn.addEventListener("click", ()=>{
+const key = btn.getAttribute("data-edit");
+const p = ALL.find(x=>x.key===key);
+if(p) fillForm(p);
+});
+});
+adminTable.querySelectorAll("[data-del]").forEach(btn=>{
+btn.addEventListener("click", ()=>{
+deleteProduct(btn.getAttribute("data-del"));
+});
+});
+}
+
+/* ===== Live Firebase sync ===== */
+productsRef.on("value", (snap)=>{
+const items = [];
+snap.forEach(child=>{
+const v = child.val() || {};
+items.push({
+key: child.key,
+name: v.name||"",
+category: v.category||"",
+ref: v.ref||"",
+description: v.description||"",
+images: Array.isArray(v.images)?v.images:[],
+sizes: Array.isArray(v.sizes)?v.sizes:[],
+priceDZD: Number(v.priceDZD||0),
+createdAt: Number(v.createdAt||0)
+});
+});
+ALL = items;
+buildFilterOptions();
+renderCatalogue();
+renderAdminTable();
+});
+</script>
+</body>
+</html>
