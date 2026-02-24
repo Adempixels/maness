@@ -61,7 +61,7 @@ from{ transform: translate3d(-1.5%, -1%, 0); opacity:.45; }
 to{ transform: translate3d(1.5%, 1%, 0); opacity:.62; }
 }
 
-/* Effet curseur lumineux (souris) */
+/* Effet curseur lumineux */
 .spark{
 position: fixed;
 width: 14px;
@@ -80,15 +80,16 @@ transition: opacity .15s ease;
 .intro{
 position: fixed;
 inset:0;
-z-index:50;
+z-index:9999;
 display:flex;
 align-items:center;
 justify-content:center;
 background: rgba(255,255,255,.55);
 backdrop-filter: blur(10px);
-transition: opacity .9s ease, visibility .9s ease;
+transition: opacity .8s ease, visibility .8s ease;
 }
-.intro.hide{ opacity:0; visibility:hidden; }
+.intro.hide{ opacity:0; visibility:hidden; pointer-events:none; }
+
 .introCard{
 width:min(560px, 92vw);
 border-radius: 28px;
@@ -491,7 +492,7 @@ background: linear-gradient(90deg, rgba(255,120,120,.95), rgba(255,195,195,.92))
 border: 0;
 }
 
-/* ===== Petit coin (ARABE uniquement) : reset 24h + source + date ===== */
+/* Petit coin arabe */
 .arabicCorner{
 margin-top: 12px;
 display:flex;
@@ -555,13 +556,10 @@ font-weight: 1000;
 background: rgba(255,255,255,.80);
 color:#5c2a4f;
 }
-.aminBtn:disabled{
-opacity: .75;
-cursor: not-allowed;
-}
+.aminBtn:disabled{ opacity:.75; cursor:not-allowed; }
 </style>
 
-<!-- Firebase compat (OK GitHub Pages) -->
+<!-- Firebase compat -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 </head>
@@ -604,7 +602,6 @@ Catalogue élégant, contact direct sur WhatsApp, paiement sur place.
 <div class="pill">MA NESS — L’élégance qui parle doucement.</div>
 <div class="pill" style="margin-left:8px;">🔊 Cliquez n’importe où : récitation au 1er clic</div>
 
-<!-- Petit coin arabe (petit) -->
 <div class="arabicCorner">
 <div class="arabicCard" aria-label="ركن دعاء اليوم" dir="rtl" lang="ar">
 <div class="arabicTitle">
@@ -759,6 +756,11 @@ Catalogue élégant, contact direct sur WhatsApp, paiement sur place.
 </div>
 </div>
 
+<!-- AUDIO HTML (le plus fiable) -->
+<audio id="recitation" preload="auto">
+<source src="sourate.mp3" type="audio/mpeg">
+</audio>
+
 <script>
 /* ===== CONTACT ===== */
 const SHOP_PHONE = "213655622411";
@@ -768,8 +770,15 @@ const DELIVERY_TEXT = "Livraison : Ouled Rechache + villes proches. Paiement sur
 /* ===== ADMIN ===== */
 const ADMIN_PASSWORD = "MN@Ness#7281";
 
-/* ===== INTRO 5s ===== */
-setTimeout(()=> document.getElementById("intro").classList.add("hide"), 5000);
+/* ===== INTRO : 5 secondes MAX (et aussi au clic) ===== */
+window.addEventListener("load", () => {
+const intro = document.getElementById("intro");
+if (!intro) return;
+const hide = () => intro.classList.add("hide");
+setTimeout(hide, 5000);
+document.addEventListener("click", hide, { once:true });
+document.addEventListener("touchstart", hide, { once:true });
+});
 
 /* ===== Curseur lumineux ===== */
 const spark = document.getElementById("spark");
@@ -794,35 +803,18 @@ firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 const productsRef = db.ref("products");
 
-/* ===== RÉCITATION : démarre au 1er clic/tap (FIABLE) =====
-⚠️ Mets "sourate.mp3" à côté de "index.html"
-*/
-let recitation;
+/* ===== RÉCITATION : démarre au 1er clic/tap (sûr) ===== */
 let recitationStarted = false;
-
-function initRecitation(){
-if(recitation) return;
-const mp3Url = new URL("./sourate.mp3", window.location.href).href;
-recitation = new Audio(mp3Url);
-recitation.loop = false;
-recitation.volume = 0.65;
-recitation.preload = "auto";
+function startRecitation() {
+if (recitationStarted) return;
+const audio = document.getElementById("recitation");
+if (!audio) return;
+audio.volume = 0.7;
+audio.play().then(()=>{ recitationStarted = true; })
+.catch(err=>console.log("Lecture bloquée :", err));
 }
-
-async function tryStartRecitation(){
-if(recitationStarted) return;
-try{
-initRecitation();
-await recitation.play();
-recitationStarted = true;
-window.removeEventListener("pointerdown", tryStartRecitation);
-window.removeEventListener("keydown", tryStartRecitation);
-}catch(e){
-console.log("Recitation not started yet, retry on next click:", e);
-}
-}
-window.addEventListener("pointerdown", tryStartRecitation);
-window.addEventListener("keydown", tryStartRecitation);
+document.addEventListener("click", startRecitation);
+document.addEventListener("touchstart", startRecitation);
 
 /* ===== Petit coin ARABE : reset 24h + source + date + آمين 1 fois/jour ===== */
 const ARABIC_DAILY = [
@@ -832,7 +824,6 @@ const ARABIC_DAILY = [
 { text: "رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً وَفِي الْآخِرَةِ حَسَنَةً وَقِنَا عَذَابَ النَّارِ", source: "القرآن الكريم", ref: "البقرة: ٢٠١" },
 { text: "سُبْحَانَ اللَّهِ وَبِحَمْدِهِ، سُبْحَانَ اللَّهِ الْعَظِيمِ", source: "صحيح البخاري", ref: "حديث" }
 ];
-
 function dayKey(){
 const d = new Date();
 const y = d.getFullYear();
@@ -843,7 +834,6 @@ return `${y}-${m}-${da}`;
 function arabicDate(){
 return new Date().toLocaleDateString("ar-DZ", { weekday:"long", year:"numeric", month:"long", day:"numeric" });
 }
-
 function setDailyArabic(index){
 const item = ARABIC_DAILY[index % ARABIC_DAILY.length];
 const t = document.getElementById("arabicText");
@@ -857,30 +847,6 @@ m.textContent = `${src}${ref} • ${arabicDate()}`;
 localStorage.setItem("ar_daily_day", dayKey());
 localStorage.setItem("ar_daily_index", String(index));
 }
-
-function initDailyArabic(){
-const today = dayKey();
-const savedDay = localStorage.getItem("ar_daily_day");
-
-if(savedDay !== today){
-// nouvelle journée -> nouvelle douaa / verset
-const idx = Math.floor(Math.random() * ARABIC_DAILY.length);
-setDailyArabic(idx);
-// reset du bouton آمين
-localStorage.removeItem("amin_clicked_day");
-}else{
-const idx = Number(localStorage.getItem("ar_daily_index") || "0");
-setDailyArabic(idx);
-}
-refreshAminButton();
-}
-
-function nextArabicDaily(){
-const idx = Number(localStorage.getItem("ar_daily_index") || "0") + 1;
-setDailyArabic(idx);
-refreshAminButton();
-}
-
 function refreshAminButton(){
 const btn = document.getElementById("aminBtn");
 if(!btn) return;
@@ -892,7 +858,24 @@ btn.disabled = false;
 btn.textContent = "آمين 🤲";
 }
 }
-
+function initDailyArabic(){
+const today = dayKey();
+const savedDay = localStorage.getItem("ar_daily_day");
+if(savedDay !== today){
+const idx = Math.floor(Math.random() * ARABIC_DAILY.length);
+setDailyArabic(idx);
+localStorage.removeItem("amin_clicked_day");
+}else{
+const idx = Number(localStorage.getItem("ar_daily_index") || "0");
+setDailyArabic(idx);
+}
+refreshAminButton();
+}
+function nextArabicDaily(){
+const idx = Number(localStorage.getItem("ar_daily_index") || "0") + 1;
+setDailyArabic(idx);
+refreshAminButton();
+}
 function sayAminDaily(){
 if(localStorage.getItem("amin_clicked_day") === dayKey()){
 refreshAminButton();
@@ -901,7 +884,6 @@ return;
 localStorage.setItem("amin_clicked_day", dayKey());
 refreshAminButton();
 }
-
 document.addEventListener("DOMContentLoaded", initDailyArabic);
 
 /* ===== Utils boutique ===== */
@@ -1001,8 +983,7 @@ ${images.length>1 ? `<div class="photos">📷 ${images.length}</div>` : ``}
 ${images.length ? `<button class="mini view" type="button" onclick="openGallery('${p.key}')">Voir photos</button>` : ``}
 </div>
 </div>
-</div>
-`;
+</div>`;
 }).join("");
 }
 
@@ -1074,7 +1055,6 @@ setTimeout(()=>adminPass.focus(), 60);
 });
 function closeAdminLogin(){ adminLoginModal.classList.add("hidden"); }
 function closeAdminPanel(){ adminPanelModal.classList.add("hidden"); }
-
 adminLoginModal.addEventListener("click", (e)=>{ if(e.target===adminLoginModal) closeAdminLogin(); });
 adminPanelModal.addEventListener("click", (e)=>{ if(e.target===adminPanelModal) closeAdminPanel(); });
 
@@ -1083,9 +1063,7 @@ if(adminPass.value === ADMIN_PASSWORD){
 closeAdminLogin();
 adminPanelModal.classList.remove("hidden");
 renderAdminTable();
-}else{
-alert("Mot de passe incorrect");
-}
+}else alert("Mot de passe incorrect");
 }
 
 /* Admin form */
@@ -1121,7 +1099,6 @@ pSizes.value=""; pDesc.value="";
 editHint.textContent="";
 clearImageState();
 }
-
 function fillForm(p){
 EDIT_KEY = p.key;
 pName.value = p.name||"";
@@ -1131,14 +1108,12 @@ pRef.value = p.ref||"";
 pSizes.value = (p.sizes||[]).join(",");
 pDesc.value = p.description||"";
 editHint.textContent = "✏️ Modification : " + (p.name||"");
-
 existingImages = Array.isArray(p.images)?p.images.slice():[];
 removedExisting = new Set();
 newImages = [];
 pImages.value="";
 renderAdminThumbs();
 }
-
 function fileToDataURL(file){
 return new Promise((resolve,reject)=>{
 const r = new FileReader();
@@ -1151,7 +1126,6 @@ function countAfter(){
 const kept = existingImages.filter((_,i)=>!removedExisting.has(i)).length;
 return kept + newImages.length;
 }
-
 pImages.addEventListener("change", async ()=>{
 const files = Array.from(pImages.files||[]);
 if(!files.length) return;
@@ -1177,7 +1151,6 @@ newImages.push(...dataUrls);
 pImages.value="";
 renderAdminThumbs();
 });
-
 function renderAdminThumbs(){
 const keptExisting = existingImages
 .map((src,idx)=>({src, type:"existing", idx}))
@@ -1191,17 +1164,18 @@ return;
 }
 
 thumbsAdmin.innerHTML = all.map((x,pos)=>`
-<div class="thumbA" data-type="${x.type}" data-idx="${x.idx}">
+<div class="thumbA" data-type="${x.type}" data-idx="${x.idx}" data-pos="${pos}">
 <img src="${esc(x.src)}" alt="photo">
 <div class="x">×</div>
 <div class="coverTag">${pos===0 ? "Couverture" : "Mettre couverture"}</div>
 </div>
 `).join("");
 
-thumbsAdmin.querySelectorAll(".thumbA").forEach((el,pos)=>{
+thumbsAdmin.querySelectorAll(".thumbA").forEach(el=>{
 el.addEventListener("click", ()=>{
 const type = el.getAttribute("data-type");
 const idx = Number(el.getAttribute("data-idx"));
+const pos = Number(el.getAttribute("data-pos"));
 if(pos===0){ removeThumb(type, idx); }
 else{ makeCover(type, idx); }
 });
@@ -1228,7 +1202,6 @@ removedExisting = new Set();
 newImages = [];
 renderAdminThumbs();
 }
-
 function validateProduct(){
 const name = pName.value.trim();
 const category = pCategory.value.trim();
@@ -1241,12 +1214,10 @@ if(!category) return {ok:false, msg:"Catégorie obligatoire"};
 if(!Number.isFinite(price) || price<=0) return {ok:false, msg:"Prix invalide"};
 return {ok:true, data:{name, category, priceDZD:price, ref, sizes, description:desc}};
 }
-
 function buildFinalImages(){
 const keptExisting = existingImages.filter((_,i)=>!removedExisting.has(i));
 return [...keptExisting, ...newImages].slice(0, MAX_IMAGES);
 }
-
 function saveProduct(){
 const v = validateProduct();
 if(!v.ok){ alert(v.msg); return; }
@@ -1269,12 +1240,10 @@ clearForm();
 }).catch(err=>{ console.error(err); alert("❌ Erreur Firebase (rules ?)"); });
 }
 }
-
 function deleteProduct(key){
 if(!confirm("Supprimer ce produit ?")) return;
 productsRef.child(key).remove().catch(err=>{ console.error(err); alert("❌ Erreur suppression."); });
 }
-
 function renderAdminTable(){
 if(adminPanelModal.classList.contains("hidden")) return;
 const rows = ALL.slice().sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
@@ -1294,8 +1263,7 @@ return `
 <button class="btnSmall danger" type="button" data-del="${p.key}">Supprimer</button>
 </div>
 </td>
-</tr>
-`;
+</tr>`;
 }).join("");
 
 adminTable.querySelectorAll("[data-edit]").forEach(btn=>{
@@ -1334,53 +1302,6 @@ buildFilterOptions();
 renderCatalogue();
 renderAdminTable();
 });
-
-/* ===== Filter options ===== */
-function buildFilterOptions(){
-const cats = unique(ALL.map(p=>p.category).filter(Boolean)).sort((a,b)=>a.localeCompare(b,"fr"));
-const sizes = unique(ALL.flatMap(p=>Array.isArray(p.sizes)?p.sizes:[]).filter(Boolean)).sort();
-
-const prevCat = catEl.value || "all";
-const prevSize = sizeEl.value || "all";
-
-catEl.innerHTML = `<option value="all">Toutes catégories</option>` + cats.map(c=>`<option value="${esc(c)}">${esc(c)}</option>`).join("");
-sizeEl.innerHTML = `<option value="all">Toutes tailles</option>` + sizes.map(s=>`<option value="${esc(s)}">${esc(s)}</option>`).join("");
-
-if([...catEl.options].some(o=>o.value===prevCat)) catEl.value = prevCat;
-if([...sizeEl.options].some(o=>o.value===prevSize)) sizeEl.value = prevSize;
-}
-  if([...sizeEl.options].some(o=>o.value===prevSize)) sizeEl.value = prevSize;
-
-let recitationStarted = false;
-
-function startRecitation() {
-if (recitationStarted) return;
-
-const audio = document.getElementById("recitation");
-if (!audio) return;
-
-audio.volume = 0.7;
-
-audio.play().then(() => {
-recitationStarted = true;
-}).catch(err => {
-console.log("Lecture bloquée :", err);
-});
-}
-
-document.addEventListener("click", startRecitation);
-document.addEventListener("touchstart", startRecitation);
-
 </script>
-
-<audio id="recitation" preload="auto">
-<source src="sourate.mp3" type="audio/mpeg">
-</audio>
-
-</script>
-  <audio id="recitation" preload="auto">
-<source src="sourate.mp3" type="audio/mpeg">
-</audio>
 </body>
 </html>
-
