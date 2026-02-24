@@ -1349,6 +1349,38 @@ sizeEl.innerHTML = `<option value="all">Toutes tailles</option>` + sizes.map(s=>
 if([...catEl.options].some(o=>o.value===prevCat)) catEl.value = prevCat;
 if([...sizeEl.options].some(o=>o.value===prevSize)) sizeEl.value = prevSize;
 }
+  if([...sizeEl.options].some(o=>o.value===prevSize)) sizeEl.value = prevSize;
+
+let recitationStarted = false;
+
+function startRecitation() {
+if (recitationStarted) return;
+
+const audio = document.getElementById("recitation");
+if (!audio) return;
+
+audio.volume = 0.7;
+
+audio.play().then(() => {
+recitationStarted = true;
+}).catch(err => {
+console.log("Lecture bloquée :", err);
+});
+}
+
+document.addEventListener("click", startRecitation);
+document.addEventListener("touchstart", startRecitation);
+
 </script>
+
+<audio id="recitation" preload="auto">
+<source src="sourate.mp3" type="audio/mpeg">
+</audio>
+
+</script>
+  <audio id="recitation" preload="auto">
+<source src="sourate.mp3" type="audio/mpeg">
+</audio>
 </body>
 </html>
+
