@@ -12,11 +12,7 @@
 --gold:#c9ad6a;
 --ink:#1e0f1a;
 --muted:#6a5164;
---card: rgba(255,255,255,.86);
---glass: rgba(255,255,255,.30);
---line: rgba(255,255,255,.45);
 --shadow: 0 18px 60px rgba(0,0,0,.12);
---r: 22px;
 }
 *{box-sizing:border-box}
 body{
@@ -27,7 +23,7 @@ overflow-x:hidden;
 background: linear-gradient(180deg, var(--rose2), #fff);
 }
 
-/* ✅ FOND CLAIR + IMAGE + ANIM DOUCE (PAS NOIR) */
+/* Fond clair + image + animation douce (pas noir) */
 .bg{
 position: fixed;
 inset:0;
@@ -47,7 +43,6 @@ from{ transform: scale(1.05) translate3d(0,0,0); }
 to{ transform: scale(1.08) translate3d(-1.2%, -0.8%, 0); }
 }
 
-/* Brume rose très légère */
 .mist{
 position: fixed;
 inset:-20%;
@@ -66,7 +61,7 @@ from{ transform: translate3d(-1.5%, -1%, 0); opacity:.45; }
 to{ transform: translate3d(1.5%, 1%, 0); opacity:.62; }
 }
 
-/* Intro (5 secondes) */
+/* Intro 5s */
 .intro{
 position: fixed;
 inset:0;
@@ -147,6 +142,7 @@ font-weight: 1000;
 letter-spacing:.12em;
 background: linear-gradient(135deg, rgba(253,227,238,.9), rgba(201,173,106,.45));
 border: 1px solid rgba(255,255,255,.8);
+color:#5c2a4f;
 }
 .brandTitle b{
 display:block;
@@ -187,6 +183,7 @@ background: rgba(255,255,255,.55);
 border: 1px solid rgba(255,255,255,.75);
 backdrop-filter: blur(10px);
 box-shadow: var(--shadow);
+text-align:left;
 }
 .hero h1{
 margin:0;
@@ -296,7 +293,7 @@ background: rgba(255,255,255,.88);
 border: 1px solid rgba(0,0,0,.06);
 color:#2a1024;
 }
-.body{ padding: 14px; }
+.body{ padding: 14px; text-align:left; }
 .name{ margin:0; font-weight: 950; color:#2a1024; }
 .meta{ margin:6px 0 0; color: rgba(92,42,79,.70); font-size: 12px; font-weight: 800; }
 .desc{ margin:10px 0 0; color:#2a1024; font-size: 13px; line-height:1.45; }
@@ -407,6 +404,7 @@ border: 1px solid rgba(0,0,0,.08);
 border-radius: 22px;
 padding: 14px;
 box-shadow: 0 16px 42px rgba(0,0,0,.10);
+text-align:left;
 }
 .adminBox h3{ margin:0 0 10px; letter-spacing:.08em; color:#5c2a4f; }
 .adminRow{ display:flex; gap:10px; flex-wrap:wrap; }
@@ -488,7 +486,7 @@ border: 0;
 <div class="bg"></div>
 <div class="mist"></div>
 
-<!-- ✅ INTRO 5s puis disparaît -->
+<!-- Intro -->
 <div class="intro" id="intro">
 <div class="introCard">
 <div class="brandAnim">MA NESS</div>
@@ -507,8 +505,8 @@ border: 0;
 </div>
 </div>
 <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end;">
-<button class="btn2" onclick="openEmail()">✉️ Email</button>
-<button class="btn" onclick="openWhatsApp()">WhatsApp</button>
+<button class="btn2" type="button" onclick="openEmail()">✉️ Email</button>
+<button class="btn" type="button" onclick="openWhatsApp()">WhatsApp</button>
 </div>
 </div>
 
@@ -518,7 +516,8 @@ border: 0;
 Catalogue élégant, contact direct sur WhatsApp, paiement sur place.
 <b>Livraison : Ouled Rechache + villes proches</b>.
 </p>
-<div class="pill">🚚 Livraison proche • 📲 WhatsApp direct • 💳 Paiement sur place</div>
+<div class="pill">MA NESS — L’élégance qui parle doucement.</div>
+<div class="pill" style="margin-left:8px;">🔊 Cliquez n’importe où pour lancer la récitation</div>
 </section>
 
 <section class="catalog">
@@ -536,7 +535,7 @@ Catalogue élégant, contact direct sur WhatsApp, paiement sur place.
 <option value="priceAsc">Prix (croissant)</option>
 <option value="priceDesc">Prix (décroissant)</option>
 </select>
-<button class="btn2" onclick="resetFilters()">Réinitialiser</button>
+<button class="btn2" type="button" onclick="resetFilters()">Réinitialiser</button>
 </div>
 
 <div class="products" id="products">Chargement…</div>
@@ -554,7 +553,7 @@ Catalogue élégant, contact direct sur WhatsApp, paiement sur place.
 <b id="gTitle">Photos</b>
 <div style="font-size:12px;opacity:.85" id="gSub"></div>
 </div>
-<button class="closeBtn" onclick="closeGallery()">Fermer</button>
+<button class="closeBtn" type="button" onclick="closeGallery()">Fermer</button>
 </div>
 <div class="modalBody">
 <div class="galleryMain"><img id="gMain" alt="Photo"></div>
@@ -568,15 +567,15 @@ Catalogue élégant, contact direct sur WhatsApp, paiement sur place.
 <div class="modalCard" style="width:min(520px,96vw);">
 <div class="modalHead">
 <b>ESPACE GESTION</b>
-<button class="closeBtn" onclick="closeAdminLogin()">Fermer</button>
+<button class="closeBtn" type="button" onclick="closeAdminLogin()">Fermer</button>
 </div>
 <div class="modalBody">
 <div class="adminBox">
 <div style="font-weight:1000;margin-bottom:6px;">Mot de passe admin</div>
 <input id="adminPass" type="password" placeholder="Mot de passe">
 <div style="height:10px;"></div>
-<button class="btn" onclick="loginAdmin()">Connexion</button>
-<div class="hint">Si tu veux changer le mot de passe, modifie la variable <b>ADMIN_PASSWORD</b> dans le code.</div>
+<button class="btn" type="button" onclick="loginAdmin()">Connexion</button>
+<div class="hint">Tu peux changer le mot de passe dans <b>ADMIN_PASSWORD</b>.</div>
 </div>
 </div>
 </div>
@@ -587,7 +586,7 @@ Catalogue élégant, contact direct sur WhatsApp, paiement sur place.
 <div class="modalCard">
 <div class="modalHead">
 <b>GESTION PRODUITS</b>
-<button class="closeBtn" onclick="closeAdminPanel()">Fermer</button>
+<button class="closeBtn" type="button" onclick="closeAdminPanel()">Fermer</button>
 </div>
 <div class="modalBody">
 <div class="adminGrid">
@@ -634,11 +633,11 @@ Catalogue élégant, contact direct sur WhatsApp, paiement sur place.
 
 <div style="display:flex;justify-content:flex-end;gap:10px;flex-wrap:wrap;margin-top:10px;">
 <div id="editHint" style="margin-right:auto;font-weight:1000;color:rgba(0,0,0,.65)"></div>
-<button class="btn2" onclick="clearForm()">Effacer</button>
-<button class="btn" onclick="saveProduct()">Enregistrer</button>
+<button class="btn2" type="button" onclick="clearForm()">Effacer</button>
+<button class="btn" type="button" onclick="saveProduct()">Enregistrer</button>
 </div>
 
-<div class="hint">Version gratuite (Realtime DB) : max <b>6 photos</b>, max <b>800 Ko</b> / photo.</div>
+<div class="hint">Version gratuite : max <b>6 photos</b>, max <b>800 Ko</b> / photo.</div>
 </div>
 
 <div class="adminBox">
@@ -659,14 +658,14 @@ Catalogue élégant, contact direct sur WhatsApp, paiement sur place.
 
 <script>
 /* ===== CONTACT ===== */
-const SHOP_PHONE = "";
-const SHOP_EMAIL = "";
+const SHOP_PHONE = "213655622411";
+const SHOP_EMAIL = "imanboutique67@gmail.com";
 const DELIVERY_TEXT = "Livraison : Ouled Rechache + villes proches. Paiement sur place.";
 
 /* ===== ADMIN ===== */
 const ADMIN_PASSWORD = "MN@Ness#7281";
 
-/* ✅ INTRO 5s */
+/* ===== INTRO 5s ===== */
 setTimeout(()=> document.getElementById("intro").classList.add("hide"), 5000);
 
 /* ===== Firebase config (compat) ===== */
@@ -677,12 +676,40 @@ databaseURL: "https://manes-site-default-rtdb.europe-west1.firebasedatabase.app"
 projectId: "manes-site",
 storageBucket: "manes-site.firebasestorage.app",
 messagingSenderId: "170716879590",
-appId: "1:170716879590:web:375cdada3c51a5809a7927",
-measurementId: "G-22J6LF9NH1"
+appId: "1:170716879590:web:375cdada3c51a5809a7927"
 };
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 const productsRef = db.ref("products");
+
+/* ===== RÉCITATION : AU PREMIER CLIC N’IMPORTE OÙ (PC + TEL) =====
+⚠️ Les navigateurs bloquent l’audio auto. Au 1er clic/tap, ça marche.
+*/
+let recitation;
+let startedOnce = false;
+
+function initRecitation(){
+if(recitation) return;
+recitation = new Audio("sourate.mp3"); // 🔥 mets sourate.mp3 à côté de index.html
+recitation.loop = false;
+recitation.volume = 0.65;
+recitation.preload = "auto";
+}
+
+async function startOnFirstClick(){
+if(startedOnce) return;
+startedOnce = true;
+
+try{
+initRecitation();
+await recitation.play();
+}catch(e){
+// si bloqué, on autorise un autre essai
+startedOnce = false;
+}
+}
+document.addEventListener("click", startOnFirstClick, { once: true });
+document.addEventListener("touchstart", startOnFirstClick, { once: true });
 
 /* ===== Utils ===== */
 const MAX_IMAGES = 6;
@@ -781,8 +808,8 @@ ${images.length>1 ? `<div class="photos">📷 ${images.length}</div>` : ``}
 <div class="desc">${esc(p.description||"")}</div>
 <div class="price">${dzd(p.priceDZD)}</div>
 <div class="btns">
-<button class="mini wa" onclick="openWhatsApp(${JSON.stringify(msg)})">WhatsApp</button>
-${images.length ? `<button class="mini view" onclick="openGallery('${p.key}')">Voir photos</button>` : ``}
+<button class="mini wa" type="button" onclick="openWhatsApp(${JSON.stringify(msg)})">WhatsApp</button>
+${images.length ? `<button class="mini view" type="button" onclick="openGallery('${p.key}')">Voir photos</button>` : ``}
 </div>
 </div>
 </div>
@@ -1071,8 +1098,8 @@ return `
 <td>${photos?("📷 "+photos):"—"}</td>
 <td>
 <div class="rowBtns">
-<button class="btnSmall" data-edit="${p.key}">Modifier</button>
-<button class="btnSmall danger" data-del="${p.key}">Supprimer</button>
+<button class="btnSmall" type="button" data-edit="${p.key}">Modifier</button>
+<button class="btnSmall danger" type="button" data-del="${p.key}">Supprimer</button>
 </div>
 </td>
 </tr>
