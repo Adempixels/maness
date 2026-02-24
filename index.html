@@ -76,7 +76,7 @@ z-index: 999;
 transition: opacity .15s ease;
 }
 
-/* Intro 5s */
+/* Intro 5s (on la SUPPRIME après 5s en JS -> impossible qu'elle reste) */
 .intro{
 position: fixed;
 inset:0;
@@ -86,10 +86,7 @@ align-items:center;
 justify-content:center;
 background: rgba(255,255,255,.55);
 backdrop-filter: blur(10px);
-transition: opacity .8s ease, visibility .8s ease;
 }
-.intro.hide{ opacity:0; visibility:hidden; pointer-events:none; }
-
 .introCard{
 width:min(560px, 92vw);
 border-radius: 28px;
@@ -128,7 +125,6 @@ margin: 18px auto 120px;
 position: relative;
 z-index: 1;
 }
-
 .topbar{
 display:flex;
 align-items:center;
@@ -226,6 +222,73 @@ font-weight: 850;
 letter-spacing:.05em;
 }
 
+/* Petit coin arabe */
+.arabicCorner{
+margin-top: 12px;
+display:flex;
+justify-content:flex-end;
+}
+.arabicCard{
+width: min(360px, 100%);
+border-radius: 20px;
+background: rgba(255,255,255,.62);
+border: 1px solid rgba(255,255,255,.85);
+backdrop-filter: blur(10px);
+box-shadow: 0 14px 40px rgba(0,0,0,.10);
+padding: 12px 12px 10px;
+direction: rtl;
+text-align: right;
+}
+.arabicTitle{
+font-weight: 900;
+color:#5c2a4f;
+font-size: 13px;
+display:flex;
+align-items:center;
+justify-content:space-between;
+gap:8px;
+}
+.arabicText{
+margin-top: 8px;
+font-size: 14px;
+line-height: 1.7;
+font-weight: 800;
+color:#2a1024;
+}
+.arabicSub{
+margin-top: 8px;
+font-size: 12px;
+color: rgba(92,42,79,.75);
+font-weight: 900;
+}
+.arabicActions{
+display:flex;
+gap:10px;
+flex-wrap:wrap;
+margin-top: 10px;
+direction: rtl;
+}
+.aminBtn{
+padding: 10px 14px;
+border-radius: 16px;
+border: 0;
+cursor:pointer;
+font-weight: 1000;
+background: linear-gradient(90deg, rgba(247,198,215,.95), rgba(201,173,106,.70));
+color:#2a1024;
+}
+.nextBtn{
+padding: 10px 14px;
+border-radius: 16px;
+border: 1px solid rgba(0,0,0,.10);
+cursor:pointer;
+font-weight: 1000;
+background: rgba(255,255,255,.80);
+color:#5c2a4f;
+}
+.aminBtn:disabled{ opacity:.75; cursor:not-allowed; }
+
+/* Catalogue */
 .catalog{
 margin-top: 14px;
 padding: 18px;
@@ -318,8 +381,479 @@ color:#2a1024;
 .mini{ padding:10px 12px; border-radius: 14px; font-weight: 950; }
 .mini.wa{ background: linear-gradient(90deg, rgba(247,198,215,.95), rgba(201,173,106,.70)); color:#2a1024; }
 .mini.view{ background:#fff; border:1px solid rgba(0,0,0,.08); color:#5c2a4f; }
+</style>
 
-/* Admin bouton */
+<!-- Firebase compat (GitHub Pages OK) -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+</head>
+
+<body>
+<div class="bg"></div>
+<div class="mist"></div>
+<div class="spark" id="spark"></div>
+
+<!-- Intro -->
+<div class="intro" id="intro">
+<div class="introCard">
+<div class="brandAnim">MA NESS</div>
+<div class="introLine"></div>
+<div class="introText">ABAYA COLLECTION • ALGÉRIE</div>
+</div>
+</div>
+
+<div class="wrap">
+<div class="topbar">
+<div class="brand">
+<div class="badge">MN</div>
+<div class="brandTitle">
+<b>MA NESS</b>
+<span>Paiement sur place • Catalogue en ligne</span>
+</div>
+</div>
+<div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end;">
+<button class="btn2" type="button" onclick="openEmail()">✉️ Email</button>
+<button class="btn" type="button" onclick="openWhatsApp()">WhatsApp</button>
+</div>
+</div>
+
+<section class="hero">
+<h1>Bienvenue dans MA NESS</h1>
+<p>
+Catalogue élégant, contact direct sur WhatsApp, paiement sur place.
+<b>Livraison : Ouled Rechache + villes proches</b>.
+</p>
+<div class="pill">MA NESS — L’élégance qui parle doucement.</div>
+<div class="pill" style="margin-left:8px;">🔊 Cliquez n’importe où : récitation au 1er clic</div>
+
+<!-- Petit coin arabe -->
+<div class="arabicCorner">
+<div class="arabicCard" aria-label="ركن دعاء اليوم" dir="rtl" lang="ar">
+<div class="arabicTitle">
+<span>🌙 دعاء اليوم</span>
+<span style="font-size:12px;color:rgba(92,42,79,.75);font-weight:900;">يتجدّد كل 24 ساعة</span>
+</div>
+
+<div class="arabicText" id="arabicText">...</div>
+<div class="arabicSub" id="arabicMeta"></div>
+
+<div class="arabicActions">
+<button class="aminBtn" id="aminBtn" type="button" onclick="sayAminDaily()">آمين 🤲</button>
+<button class="nextBtn" type="button" onclick="nextArabicDaily()">ذكر آخر</button>
+</div>
+</div>
+</div>
+</section>
+
+<section class="catalog">
+<div class="catalogTop">
+<h2>CATALOGUE</h2>
+<div class="count" id="countText">—</div>
+</div>
+
+<div class="filters">
+<input id="search" placeholder="Rechercher (nom, description, référence)..." />
+<select id="cat"><option value="all">Toutes catégories</option></select>
+<select id="size"><option value="all">Toutes tailles</option></select>
+<select id="sort">
+<option value="new">Nouveautés</option>
+<option value="priceAsc">Prix (croissant)</option>
+<option value="priceDesc">Prix (décroissant)</option>
+</select>
+<button class="btn2" type="button" onclick="resetFilters()">Réinitialiser</button>
+</div>
+
+<div class="products" id="products">Chargement…</div>
+</section>
+</div>
+<!-- ===== ADMIN FLOAT BUTTON ===== -->
+<div class="adminFab" id="adminFab" title="Espace gestion">
+<span>✦</span>
+</div>
+
+<!-- ===== GALERIE MODAL ===== -->
+<div class="modal hidden" id="galleryModal">
+<div class="modalCard">
+<div class="modalHead">
+<div>
+<b id="gTitle">Photos</b>
+<div style="font-size:12px;opacity:.85" id="gSub"></div>
+</div>
+<button class="closeBtn" type="button" onclick="closeGallery()">Fermer</button>
+</div>
+<div class="modalBody">
+<div class="galleryMain">
+<img id="gMain" alt="Photo">
+</div>
+<div class="strip" id="gStrip"></div>
+</div>
+</div>
+</div>
+
+<!-- ===== ADMIN LOGIN ===== -->
+<div class="modal hidden" id="adminLoginModal">
+<div class="modalCard" style="width:min(520px,96vw);">
+<div class="modalHead">
+<b>ESPACE GESTION</b>
+<button class="closeBtn" type="button" onclick="closeAdminLogin()">Fermer</button>
+</div>
+<div class="modalBody">
+<div class="adminBox">
+<div style="font-weight:1000;margin-bottom:6px;">Mot de passe admin</div>
+<input id="adminPass" type="password" placeholder="Mot de passe">
+<div style="height:10px;"></div>
+<button class="btn" type="button" onclick="loginAdmin()">Connexion</button>
+</div>
+</div>
+</div>
+</div>
+
+<!-- ===== ADMIN PANEL ===== -->
+<div class="modal hidden" id="adminPanelModal">
+<div class="modalCard">
+<div class="modalHead">
+<b>GESTION PRODUITS</b>
+<button class="closeBtn" type="button" onclick="closeAdminPanel()">Fermer</button>
+</div>
+
+<div class="modalBody">
+<div class="adminGrid">
+
+<!-- FORMULAIRE -->
+<div class="adminBox">
+<h3>Ajouter / Modifier</h3>
+
+<div class="adminRow">
+<input id="pName" placeholder="Nom du produit">
+<input id="pPrice" type="number" placeholder="Prix en DZD">
+</div>
+
+<div class="adminRow">
+<input id="pCategory" placeholder="Catégorie">
+<input id="pRef" placeholder="Référence (optionnel)">
+</div>
+
+<input id="pSizes" placeholder="Tailles (S,M,L...)">
+
+<div style="margin-top:10px;">
+<div style="font-size:12px;color:var(--muted);font-weight:1000">
+Photos depuis votre appareil (plusieurs)
+</div>
+<input id="pImages" type="file" accept="image/*" multiple>
+<div class="thumbsAdmin" id="thumbsAdmin"></div>
+</div>
+
+<textarea id="pDesc" placeholder="Description"></textarea>
+
+<div style="display:flex;justify-content:flex-end;gap:10px;margin-top:10px;">
+<button class="btn2" type="button" onclick="clearForm()">Effacer</button>
+<button class="btn" type="button" onclick="saveProduct()">Enregistrer</button>
+</div>
+</div>
+
+<!-- TABLE PRODUITS -->
+<div class="adminBox">
+<h3>Liste des produits</h3>
+<table>
+<thead>
+<tr>
+<th>Nom</th>
+<th>Prix</th>
+<th>Catégorie</th>
+<th>Photos</th>
+<th>Actions</th>
+</tr>
+</thead>
+<tbody id="adminTable">
+<tr>
+<td colspan="5">Chargement…</td>
+</tr>
+</tbody>
+</table>
+</div>
+
+</div>
+</div>
+</div>
+</div>
+
+<!-- ===== AUDIO (SOURATE) ===== -->
+<audio id="recitation" preload="auto">
+<source src="sourate.mp3" type="audio/mpeg">
+</audio>
+<script>
+
+//////////////////////////////////////
+// CONFIG BOUTIQUE
+//////////////////////////////////////
+
+const SHOP_PHONE = "213655622411";
+const SHOP_EMAIL = "imanboutique67@gmail.com";
+const ADMIN_PASSWORD = "MN@Ness#7281";
+
+//////////////////////////////////////
+// INTRO 5 SECONDES (CORRIGÉ)
+//////////////////////////////////////
+
+window.addEventListener("load", () => {
+const intro = document.getElementById("intro");
+if (!intro) return;
+
+setTimeout(() => {
+intro.style.opacity = "0";
+intro.style.pointerEvents = "none";
+setTimeout(() => {
+intro.style.display = "none";
+}, 800);
+}, 5000); // EXACTEMENT 5 secondes
+});
+
+//////////////////////////////////////
+// SOURATE — VERSION ULTRA STABLE
+//////////////////////////////////////
+
+let recitationStarted = false;
+
+function startRecitation() {
+if (recitationStarted) return;
+
+const audio = document.getElementById("recitation");
+if (!audio) return;
+
+audio.volume = 0.7;
+
+audio.play()
+.then(() => {
+recitationStarted = true;
+console.log("Sourate lancée ✅");
+})
+.catch((err) => {
+console.log("Lecture bloquée :", err);
+});
+}
+
+// Lance au premier clic ou premier touch
+document.addEventListener("click", startRecitation, { once: true });
+document.addEventListener("touchstart", startRecitation, { once: true });
+
+//////////////////////////////////////
+// CONTACT
+//////////////////////////////////////
+
+function openWhatsApp(message = "") {
+const url = "https://wa.me/" + SHOP_PHONE +
+(message ? "?text=" + encodeURIComponent(message) : "");
+window.open(url, "_blank");
+}
+
+function openEmail() {
+window.location.href = "mailto:" + SHOP_EMAIL;
+}
+
+//////////////////////////////////////
+// FIREBASE INIT (COMPAT VERSION)
+//////////////////////////////////////
+
+const firebaseConfig = {
+apiKey: "AIzaSyCQf9NiEsz9-_Bv_OE9GsxjvKBCD1CFMXs",
+authDomain: "manes-site.firebaseapp.com",
+databaseURL: "https://manes-site-default-rtdb.europe-west1.firebasedatabase.app",
+projectId: "manes-site",
+storageBucket: "manes-site.firebasestorage.app",
+messagingSenderId: "170716879590",
+appId: "1:170716879590:web:375cdada3c51a5809a7927"
+};
+
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+const productsRef = db.ref("products");
+
+//////////////////////////////////////
+// OUTILS
+//////////////////////////////////////
+
+function esc(text) {
+return String(text || "")
+.replace(/&/g,"&amp;")
+.replace(/</g,"&lt;")
+.replace(/>/g,"&gt;");
+}
+
+function formatPrice(n) {
+return Number(n || 0).toLocaleString("fr-FR") + " DZD";
+}
+
+</script>
+<script>
+//////////////////////////////////////
+// CATALOGUE (UI + FILTRES + GALERIE)
+//////////////////////////////////////
+
+let ALL = [];
+
+const productsBox = document.getElementById("products");
+const countText = document.getElementById("countText");
+const searchEl = document.getElementById("search");
+const catEl = document.getElementById("cat");
+const sizeEl = document.getElementById("size");
+const sortEl = document.getElementById("sort");
+
+function unique(arr){ return Array.from(new Set(arr)); }
+
+function parseSizes(arr){
+return Array.isArray(arr) ? arr : [];
+}
+
+function isNew(createdAt){
+const days = 5;
+return createdAt && (Date.now() - createdAt) < (days*24*60*60*1000);
+}
+
+function buildFilterOptions(){
+const cats = unique(ALL.map(p=>p.category).filter(Boolean)).sort((a,b)=>a.localeCompare(b,"fr"));
+const sizes = unique(ALL.flatMap(p=>parseSizes(p.sizes)).filter(Boolean)).sort();
+
+const prevCat = catEl.value || "all";
+const prevSize = sizeEl.value || "all";
+
+catEl.innerHTML = `<option value="all">Toutes catégories</option>` + cats.map(c=>`<option value="${esc(c)}">${esc(c)}</option>`).join("");
+sizeEl.innerHTML = `<option value="all">Toutes tailles</option>` + sizes.map(s=>`<option value="${esc(s)}">${esc(s)}</option>`).join("");
+
+if([...catEl.options].some(o=>o.value===prevCat)) catEl.value = prevCat;
+if([...sizeEl.options].some(o=>o.value===prevSize)) sizeEl.value = prevSize;
+}
+
+function getFiltered(){
+const q = (searchEl.value||"").trim().toLowerCase();
+const cat = catEl.value;
+const size = sizeEl.value;
+const sort = sortEl.value;
+
+let list = ALL.slice();
+
+if(q){
+list = list.filter(p =>
+(p.name||"").toLowerCase().includes(q) ||
+(p.description||"").toLowerCase().includes(q) ||
+(p.ref||"").toLowerCase().includes(q)
+);
+}
+if(cat !== "all") list = list.filter(p => p.category === cat);
+if(size !== "all") list = list.filter(p => (p.sizes||[]).includes(size));
+
+if(sort === "priceAsc") list.sort((a,b)=>(a.priceDZD||0)-(b.priceDZD||0));
+else if(sort === "priceDesc") list.sort((a,b)=>(b.priceDZD||0)-(a.priceDZD||0));
+else list.sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
+
+return list;
+}
+
+function renderCatalogue(){
+const list = getFiltered();
+countText.textContent = `${list.length} article(s)`;
+
+if(!list.length){
+productsBox.innerHTML = `<div style="color:rgba(92,42,79,.75);font-weight:900">Aucun produit trouvé.</div>`;
+return;
+}
+
+productsBox.innerHTML = list.map(p=>{
+const images = Array.isArray(p.images)?p.images:[];
+const cover = images[0] || "";
+const sizes = Array.isArray(p.sizes)?p.sizes:[];
+const msg = `Salam, je suis intéressé(e) par : ${p.name}\nPrix: ${p.priceDZD} DZD\n${p.ref?("Réf: "+p.ref+"\n"):""}Livraison : Ouled Rechache + villes proches. Paiement sur place.`;
+
+return `
+<div class="card">
+<div class="cover">
+${cover ? `<img src="${esc(cover)}" alt="${esc(p.name)}">` : `<div style="font-weight:1000;color:#5c2a4f">Photo</div>`}
+${isNew(p.createdAt) ? `<div class="tag">Nouveau</div>` : ``}
+${images.length>1 ? `<div class="photos">📷 ${images.length}</div>` : ``}
+</div>
+<div class="body">
+<h3 class="name">${esc(p.name)}</h3>
+<div class="meta">${esc(p.category||"")} ${p.ref ? `• Réf: ${esc(p.ref)}` : ""}</div>
+<div class="meta">Tailles: <b>${esc(sizes.join(", ") || "—")}</b></div>
+<div class="desc">${esc(p.description||"")}</div>
+<div class="price">${formatPrice(p.priceDZD)}</div>
+<div class="btns">
+<button class="mini wa" type="button" onclick="openWhatsApp(${JSON.stringify(msg)})">WhatsApp</button>
+${images.length ? `<button class="mini view" type="button" onclick="openGallery('${p.key}')">Voir photos</button>` : ``}
+</div>
+</div>
+</div>
+`;
+}).join("");
+}
+
+function resetFilters(){
+searchEl.value="";
+catEl.value="all";
+sizeEl.value="all";
+sortEl.value="new";
+renderCatalogue();
+}
+
+searchEl.addEventListener("input", renderCatalogue);
+catEl.addEventListener("change", renderCatalogue);
+sizeEl.addEventListener("change", renderCatalogue);
+sortEl.addEventListener("change", renderCatalogue);
+
+//////////////////////////////////////
+// GALERIE
+//////////////////////////////////////
+
+const galleryModal = document.getElementById("galleryModal");
+const gTitle = document.getElementById("gTitle");
+const gSub = document.getElementById("gSub");
+const gMain = document.getElementById("gMain");
+const gStrip = document.getElementById("gStrip");
+
+function openGallery(key){
+const p = ALL.find(x=>x.key===key);
+if(!p) return;
+const images = Array.isArray(p.images)?p.images:[];
+if(!images.length) return;
+
+gTitle.textContent = p.name || "Photos";
+gSub.textContent = `${formatPrice(p.priceDZD)} • ${images.length} photo(s)`;
+
+gMain.src = images[0];
+renderStrip(images, 0);
+
+galleryModal.classList.remove("hidden");
+}
+
+function renderStrip(images, active){
+gStrip.innerHTML = images.map((src,i)=>`
+<div class="thumb ${i===active?'active':''}" data-i="${i}">
+<img src="${esc(src)}" alt="photo ${i+1}">
+</div>
+`).join("");
+
+gStrip.querySelectorAll(".thumb").forEach(el=>{
+el.addEventListener("click", ()=>{
+const i = Number(el.getAttribute("data-i"));
+gMain.src = images[i];
+renderStrip(images, i);
+});
+});
+}
+
+function closeGallery(){
+galleryModal.classList.add("hidden");
+gMain.src="";
+gStrip.innerHTML="";
+}
+
+galleryModal.addEventListener("click", (e)=>{
+if(e.target===galleryModal) closeGallery();
+});
+
+</script>
+<style>
+/* ===== Styles manquants (Admin + Modals + Table) ===== */
+
 .adminFab{
 position: fixed;
 right: 16px;
@@ -352,7 +886,6 @@ z-index:-1;
 }
 .adminFab span{ font-weight: 1000; color:#5c2a4f; }
 
-/* Modals */
 .modal{
 position:fixed; inset:0;
 background: rgba(0,0,0,.45);
@@ -411,7 +944,7 @@ background:#fff;
 .thumb.active{ border-color: var(--gold); }
 .thumb img{ width:100%; height:100%; object-fit:cover; display:block; }
 
-/* Admin */
+/* Admin layout */
 .adminGrid{ display:grid; grid-template-columns: 1fr 1fr; gap:12px; }
 @media(max-width:900px){ .adminGrid{ grid-template-columns:1fr; } }
 .adminBox{
@@ -425,17 +958,6 @@ text-align:left;
 .adminBox h3{ margin:0 0 10px; letter-spacing:.08em; color:#5c2a4f; }
 .adminRow{ display:flex; gap:10px; flex-wrap:wrap; }
 .adminRow > *{ flex:1; min-width: 200px; }
-
-.hint{
-margin-top: 10px;
-padding: 10px 12px;
-border-radius: 16px;
-background: linear-gradient(90deg, rgba(247,198,215,.55), rgba(201,173,106,.20));
-border: 1px solid rgba(0,0,0,.06);
-color: rgba(42,16,36,.85);
-font-size: 13px;
-line-height: 1.35;
-}
 
 .thumbsAdmin{ display:flex; gap:10px; flex-wrap:wrap; margin-top:10px; }
 .thumbA{
@@ -475,10 +997,22 @@ overflow:hidden;
 border-radius: 16px;
 border: 1px solid rgba(0,0,0,.08);
 }
-th, td{ padding: 10px; border-bottom: 1px solid rgba(0,0,0,.06); font-size: 13px; vertical-align:top; text-align:left; }
-th{ background: rgba(247,198,215,.45); font-weight: 1000; color:#5c2a4f; letter-spacing:.04em; }
+th, td{
+padding: 10px;
+border-bottom: 1px solid rgba(0,0,0,.06);
+font-size: 13px;
+vertical-align:top;
+text-align:left;
+}
+th{
+background: rgba(247,198,215,.45);
+font-weight: 1000;
+color:#5c2a4f;
+letter-spacing:.04em;
+}
 tr:last-child td{ border-bottom:0; }
 .rowBtns{ display:flex; gap:8px; flex-wrap:wrap; }
+
 .btnSmall{
 padding: 8px 10px;
 border-radius: 14px;
@@ -491,563 +1025,20 @@ cursor:pointer;
 background: linear-gradient(90deg, rgba(255,120,120,.95), rgba(255,195,195,.92));
 border: 0;
 }
-
-/* Petit coin arabe */
-.arabicCorner{
-margin-top: 12px;
-display:flex;
-justify-content:flex-end;
-}
-.arabicCard{
-width: min(360px, 100%);
-border-radius: 20px;
-background: rgba(255,255,255,.62);
-border: 1px solid rgba(255,255,255,.85);
-backdrop-filter: blur(10px);
-box-shadow: 0 14px 40px rgba(0,0,0,.10);
-padding: 12px 12px 10px;
-direction: rtl;
-text-align: right;
-}
-.arabicTitle{
-font-weight: 900;
-color:#5c2a4f;
-font-size: 13px;
-display:flex;
-align-items:center;
-justify-content:space-between;
-gap:8px;
-}
-.arabicText{
-margin-top: 8px;
-font-size: 14px;
-line-height: 1.7;
-font-weight: 800;
-color:#2a1024;
-}
-.arabicSub{
-margin-top: 8px;
-font-size: 12px;
-color: rgba(92,42,79,.75);
-font-weight: 900;
-}
-.arabicActions{
-display:flex;
-gap:10px;
-flex-wrap:wrap;
-margin-top: 10px;
-direction: rtl;
-}
-.aminBtn{
-padding: 10px 14px;
-border-radius: 16px;
-border: 0;
-cursor:pointer;
-font-weight: 1000;
-background: linear-gradient(90deg, rgba(247,198,215,.95), rgba(201,173,106,.70));
-color:#2a1024;
-}
-.nextBtn{
-padding: 10px 14px;
-border-radius: 16px;
-border: 1px solid rgba(0,0,0,.10);
-cursor:pointer;
-font-weight: 1000;
-background: rgba(255,255,255,.80);
-color:#5c2a4f;
-}
-.aminBtn:disabled{ opacity:.75; cursor:not-allowed; }
 </style>
 
-<!-- Firebase compat -->
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
-</head>
-
-<body>
-<div class="bg"></div>
-<div class="mist"></div>
-<div class="spark" id="spark"></div>
-
-<!-- Intro -->
-<div class="intro" id="intro">
-<div class="introCard">
-<div class="brandAnim">MA NESS</div>
-<div class="introLine"></div>
-<div class="introText">ABAYA COLLECTION • ALGÉRIE</div>
-</div>
-</div>
-
-<div class="wrap">
-<div class="topbar">
-<div class="brand">
-<div class="badge">MN</div>
-<div class="brandTitle">
-<b>MA NESS</b>
-<span>Paiement sur place • Catalogue en ligne</span>
-</div>
-</div>
-<div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end;">
-<button class="btn2" type="button" onclick="openEmail()">✉️ Email</button>
-<button class="btn" type="button" onclick="openWhatsApp()">WhatsApp</button>
-</div>
-</div>
-
-<section class="hero">
-<h1>Bienvenue dans MA NESS</h1>
-<p>
-Catalogue élégant, contact direct sur WhatsApp, paiement sur place.
-<b>Livraison : Ouled Rechache + villes proches</b>.
-</p>
-<div class="pill">MA NESS — L’élégance qui parle doucement.</div>
-<div class="pill" style="margin-left:8px;">🔊 Cliquez n’importe où : récitation au 1er clic</div>
-
-<div class="arabicCorner">
-<div class="arabicCard" aria-label="ركن دعاء اليوم" dir="rtl" lang="ar">
-<div class="arabicTitle">
-<span>🌙 دعاء اليوم</span>
-<span style="font-size:12px;color:rgba(92,42,79,.75);font-weight:900;">يتجدّد كل 24 ساعة</span>
-</div>
-
-<div class="arabicText" id="arabicText">...</div>
-<div class="arabicSub" id="arabicMeta"></div>
-
-<div class="arabicActions">
-<button class="aminBtn" id="aminBtn" type="button" onclick="sayAminDaily()">آمين 🤲</button>
-<button class="nextBtn" type="button" onclick="nextArabicDaily()">ذكر آخر</button>
-</div>
-</div>
-</div>
-</section>
-
-<section class="catalog">
-<div class="catalogTop">
-<h2>CATALOGUE</h2>
-<div class="count" id="countText">—</div>
-</div>
-
-<div class="filters">
-<input id="search" placeholder="Rechercher (nom, description, référence)..." />
-<select id="cat"><option value="all">Toutes catégories</option></select>
-<select id="size"><option value="all">Toutes tailles</option></select>
-<select id="sort">
-<option value="new">Nouveautés</option>
-<option value="priceAsc">Prix (croissant)</option>
-<option value="priceDesc">Prix (décroissant)</option>
-</select>
-<button class="btn2" type="button" onclick="resetFilters()">Réinitialiser</button>
-</div>
-
-<div class="products" id="products">Chargement…</div>
-</section>
-</div>
-
-<!-- Admin -->
-<div class="adminFab" id="adminFab" title="Espace gestion"><span>✦</span></div>
-
-<!-- Galerie -->
-<div class="modal hidden" id="galleryModal">
-<div class="modalCard">
-<div class="modalHead">
-<div>
-<b id="gTitle">Photos</b>
-<div style="font-size:12px;opacity:.85" id="gSub"></div>
-</div>
-<button class="closeBtn" type="button" onclick="closeGallery()">Fermer</button>
-</div>
-<div class="modalBody">
-<div class="galleryMain"><img id="gMain" alt="Photo"></div>
-<div class="strip" id="gStrip"></div>
-</div>
-</div>
-</div>
-
-<!-- Admin login -->
-<div class="modal hidden" id="adminLoginModal">
-<div class="modalCard" style="width:min(520px,96vw);">
-<div class="modalHead">
-<b>ESPACE GESTION</b>
-<button class="closeBtn" type="button" onclick="closeAdminLogin()">Fermer</button>
-</div>
-<div class="modalBody">
-<div class="adminBox">
-<div style="font-weight:1000;margin-bottom:6px;">Mot de passe admin</div>
-<input id="adminPass" type="password" placeholder="Mot de passe">
-<div style="height:10px;"></div>
-<button class="btn" type="button" onclick="loginAdmin()">Connexion</button>
-<div class="hint">Tu peux changer le mot de passe dans <b>ADMIN_PASSWORD</b>.</div>
-</div>
-</div>
-</div>
-</div>
-
-<!-- Admin panel -->
-<div class="modal hidden" id="adminPanelModal">
-<div class="modalCard">
-<div class="modalHead">
-<b>GESTION PRODUITS</b>
-<button class="closeBtn" type="button" onclick="closeAdminPanel()">Fermer</button>
-</div>
-<div class="modalBody">
-<div class="adminGrid">
-<div class="adminBox">
-<h3>Ajouter / Modifier</h3>
-
-<div class="adminRow">
-<div>
-<div style="font-size:12px;color:var(--muted);font-weight:1000">Nom</div>
-<input id="pName" placeholder="Ex: Abaya satin rose">
-</div>
-<div>
-<div style="font-size:12px;color:var(--muted);font-weight:1000">Prix (DZD)</div>
-<input id="pPrice" type="number" placeholder="Ex: 6800">
-</div>
-</div>
-
-<div class="adminRow" style="margin-top:10px;">
-<div>
-<div style="font-size:12px;color:var(--muted);font-weight:1000">Catégorie</div>
-<input id="pCategory" placeholder="Ex: Abayas">
-</div>
-<div>
-<div style="font-size:12px;color:var(--muted);font-weight:1000">Référence (optionnel)</div>
-<input id="pRef" placeholder="Ex: MN-001">
-</div>
-</div>
-
-<div style="margin-top:10px;">
-<div style="font-size:12px;color:var(--muted);font-weight:1000">Tailles (séparées par virgule)</div>
-<input id="pSizes" placeholder="Ex: S,M,L">
-</div>
-
-<div style="margin-top:10px;">
-<div style="font-size:12px;color:var(--muted);font-weight:1000">Photos depuis votre appareil (plusieurs)</div>
-<input id="pImages" type="file" accept="image/*" multiple>
-<div class="thumbsAdmin" id="thumbsAdmin"></div>
-</div>
-
-<div style="margin-top:10px;">
-<div style="font-size:12px;color:var(--muted);font-weight:1000">Description</div>
-<textarea id="pDesc" placeholder="Détails (matière, couleur, etc.)"></textarea>
-</div>
-
-<div style="display:flex;justify-content:flex-end;gap:10px;flex-wrap:wrap;margin-top:10px;">
-<div id="editHint" style="margin-right:auto;font-weight:1000;color:rgba(0,0,0,.65)"></div>
-<button class="btn2" type="button" onclick="clearForm()">Effacer</button>
-<button class="btn" type="button" onclick="saveProduct()">Enregistrer</button>
-</div>
-
-<div class="hint">Version gratuite : max <b>6 photos</b>, max <b>800 Ko</b> / photo.</div>
-</div>
-
-<div class="adminBox">
-<h3>Liste des produits</h3>
-<table>
-<thead>
-<tr>
-<th>Nom</th><th>Prix</th><th>Cat.</th><th>Photos</th><th>Actions</th>
-</tr>
-</thead>
-<tbody id="adminTable"><tr><td colspan="5">Chargement…</td></tr></tbody>
-</table>
-</div>
-</div>
-</div>
-</div>
-</div>
-
-<!-- AUDIO HTML (le plus fiable) -->
-<audio id="recitation" preload="auto">
-<source src="sourate.mp3" type="audio/mpeg">
-</audio>
-
 <script>
-/* ===== CONTACT ===== */
-const SHOP_PHONE = "213655622411";
-const SHOP_EMAIL = "imanboutique67@gmail.com";
-const DELIVERY_TEXT = "Livraison : Ouled Rechache + villes proches. Paiement sur place.";
+//////////////////////////////////////
+// ADMIN COMPLET + SYNC FIREBASE LIVE
+//////////////////////////////////////
 
-/* ===== ADMIN ===== */
-const ADMIN_PASSWORD = "MN@Ness#7281";
-
-/* ===== INTRO : 5 secondes MAX (et aussi au clic) ===== */
-window.addEventListener("load", () => {
-const intro = document.getElementById("intro");
-if (!intro) return;
-const hide = () => intro.classList.add("hide");
-setTimeout(hide, 5000);
-document.addEventListener("click", hide, { once:true });
-document.addEventListener("touchstart", hide, { once:true });
-});
-
-/* ===== Curseur lumineux ===== */
-const spark = document.getElementById("spark");
-window.addEventListener("mousemove", (e)=>{
-spark.style.opacity = "1";
-spark.style.left = e.clientX + "px";
-spark.style.top = e.clientY + "px";
-});
-window.addEventListener("mouseleave", ()=> spark.style.opacity = "0");
-
-/* ===== Firebase config (compat) ===== */
-const firebaseConfig = {
-apiKey: "AIzaSyCQf9NiEsz9-_Bv_OE9GsxjvKBCD1CFMXs",
-authDomain: "manes-site.firebaseapp.com",
-databaseURL: "https://manes-site-default-rtdb.europe-west1.firebasedatabase.app",
-projectId: "manes-site",
-storageBucket: "manes-site.firebasestorage.app",
-messagingSenderId: "170716879590",
-appId: "1:170716879590:web:375cdada3c51a5809a7927"
-};
-firebase.initializeApp(firebaseConfig);
-const db = firebase.database();
-const productsRef = db.ref("products");
-
-/* ===== RÉCITATION : démarre au 1er clic/tap (sûr) ===== */
-let recitationStarted = false;
-function startRecitation() {
-if (recitationStarted) return;
-const audio = document.getElementById("recitation");
-if (!audio) return;
-audio.volume = 0.7;
-audio.play().then(()=>{ recitationStarted = true; })
-.catch(err=>console.log("Lecture bloquée :", err));
-}
-document.addEventListener("click", startRecitation);
-document.addEventListener("touchstart", startRecitation);
-
-/* ===== Petit coin ARABE : reset 24h + source + date + آمين 1 fois/jour ===== */
-const ARABIC_DAILY = [
-{ text: "﴿ وَقَالَ رَبُّكُمُ ادْعُونِي أَسْتَجِبْ لَكُمْ ﴾", source: "القرآن الكريم", ref: "غافر: ٦٠" },
-{ text: "﴿ إِنَّ مَعَ الْعُسْرِ يُسْرًا ﴾", source: "القرآن الكريم", ref: "الشرح: ٦" },
-{ text: "اللَّهُمَّ إِنِّي أَسْأَلُكَ الْعَفْوَ وَالْعَافِيَةَ", source: "دعاء", ref: "" },
-{ text: "رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً وَفِي الْآخِرَةِ حَسَنَةً وَقِنَا عَذَابَ النَّارِ", source: "القرآن الكريم", ref: "البقرة: ٢٠١" },
-{ text: "سُبْحَانَ اللَّهِ وَبِحَمْدِهِ، سُبْحَانَ اللَّهِ الْعَظِيمِ", source: "صحيح البخاري", ref: "حديث" }
-];
-function dayKey(){
-const d = new Date();
-const y = d.getFullYear();
-const m = String(d.getMonth()+1).padStart(2,"0");
-const da = String(d.getDate()).padStart(2,"0");
-return `${y}-${m}-${da}`;
-}
-function arabicDate(){
-return new Date().toLocaleDateString("ar-DZ", { weekday:"long", year:"numeric", month:"long", day:"numeric" });
-}
-function setDailyArabic(index){
-const item = ARABIC_DAILY[index % ARABIC_DAILY.length];
-const t = document.getElementById("arabicText");
-const m = document.getElementById("arabicMeta");
-if(t) t.textContent = item.text;
-if(m){
-const src = item.source ? `المصدر: ${item.source}` : "";
-const ref = item.ref ? ` • ${item.ref}` : "";
-m.textContent = `${src}${ref} • ${arabicDate()}`;
-}
-localStorage.setItem("ar_daily_day", dayKey());
-localStorage.setItem("ar_daily_index", String(index));
-}
-function refreshAminButton(){
-const btn = document.getElementById("aminBtn");
-if(!btn) return;
-if(localStorage.getItem("amin_clicked_day") === dayKey()){
-btn.disabled = true;
-btn.textContent = "تم ✅";
-}else{
-btn.disabled = false;
-btn.textContent = "آمين 🤲";
-}
-}
-function initDailyArabic(){
-const today = dayKey();
-const savedDay = localStorage.getItem("ar_daily_day");
-if(savedDay !== today){
-const idx = Math.floor(Math.random() * ARABIC_DAILY.length);
-setDailyArabic(idx);
-localStorage.removeItem("amin_clicked_day");
-}else{
-const idx = Number(localStorage.getItem("ar_daily_index") || "0");
-setDailyArabic(idx);
-}
-refreshAminButton();
-}
-function nextArabicDaily(){
-const idx = Number(localStorage.getItem("ar_daily_index") || "0") + 1;
-setDailyArabic(idx);
-refreshAminButton();
-}
-function sayAminDaily(){
-if(localStorage.getItem("amin_clicked_day") === dayKey()){
-refreshAminButton();
-return;
-}
-localStorage.setItem("amin_clicked_day", dayKey());
-refreshAminButton();
-}
-document.addEventListener("DOMContentLoaded", initDailyArabic);
-
-/* ===== Utils boutique ===== */
-function openWhatsApp(prefill){
-const msg = prefill ? ("?text=" + encodeURIComponent(prefill)) : "";
-window.open("https://wa.me/" + SHOP_PHONE + msg, "_blank");
-}
-function openEmail(){ window.location.href = "mailto:" + SHOP_EMAIL; }
-function esc(s){
-return String(s ?? "").replace(/[&<>"']/g, m => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;" }[m]));
-}
-function dzd(n){ return Number(n||0).toLocaleString("fr-FR") + " DZD"; }
-function parseSizes(s){ return String(s||"").split(",").map(x=>x.trim()).filter(Boolean); }
-function unique(arr){ return Array.from(new Set(arr)); }
-function isNew(createdAt){
-const days = 5;
-return createdAt && (Date.now() - createdAt) < (days*24*60*60*1000);
-}
-
-/* ===== Catalogue state ===== */
-let ALL = [];
-const productsBox = document.getElementById("products");
-const countText = document.getElementById("countText");
-const searchEl = document.getElementById("search");
-const catEl = document.getElementById("cat");
-const sizeEl = document.getElementById("size");
-const sortEl = document.getElementById("sort");
-
-function buildFilterOptions(){
-const cats = unique(ALL.map(p=>p.category).filter(Boolean)).sort((a,b)=>a.localeCompare(b,"fr"));
-const sizes = unique(ALL.flatMap(p=>Array.isArray(p.sizes)?p.sizes:[]).filter(Boolean)).sort();
-
-const prevCat = catEl.value || "all";
-const prevSize = sizeEl.value || "all";
-
-catEl.innerHTML = `<option value="all">Toutes catégories</option>` + cats.map(c=>`<option value="${esc(c)}">${esc(c)}</option>`).join("");
-sizeEl.innerHTML = `<option value="all">Toutes tailles</option>` + sizes.map(s=>`<option value="${esc(s)}">${esc(s)}</option>`).join("");
-
-if([...catEl.options].some(o=>o.value===prevCat)) catEl.value = prevCat;
-if([...sizeEl.options].some(o=>o.value===prevSize)) sizeEl.value = prevSize;
-}
-
-function getFiltered(){
-const q = (searchEl.value||"").trim().toLowerCase();
-const cat = catEl.value;
-const size = sizeEl.value;
-const sort = sortEl.value;
-
-let list = ALL.slice();
-if(q){
-list = list.filter(p =>
-(p.name||"").toLowerCase().includes(q) ||
-(p.description||"").toLowerCase().includes(q) ||
-(p.ref||"").toLowerCase().includes(q)
-);
-}
-if(cat !== "all") list = list.filter(p => p.category === cat);
-if(size !== "all") list = list.filter(p => (p.sizes||[]).includes(size));
-
-if(sort === "priceAsc") list.sort((a,b)=>(a.priceDZD||0)-(b.priceDZD||0));
-else if(sort === "priceDesc") list.sort((a,b)=>(b.priceDZD||0)-(a.priceDZD||0));
-else list.sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
-
-return list;
-}
-
-function renderCatalogue(){
-const list = getFiltered();
-countText.textContent = `${list.length} article(s)`;
-
-if(!list.length){
-productsBox.innerHTML = `<div style="color:rgba(92,42,79,.75);font-weight:900">Aucun produit trouvé.</div>`;
-return;
-}
-
-productsBox.innerHTML = list.map(p=>{
-const images = Array.isArray(p.images)?p.images:[];
-const cover = images[0] || "";
-const sizes = Array.isArray(p.sizes)?p.sizes:[];
-const msg = `Salam, je suis intéressé(e) par : ${p.name}\nPrix: ${p.priceDZD} DZD\n${p.ref?("Réf: "+p.ref+"\n"):""}${DELIVERY_TEXT}`;
-
-return `
-<div class="card">
-<div class="cover">
-${cover ? `<img src="${esc(cover)}" alt="${esc(p.name)}" />` : `<div style="font-weight:1000;color:#5c2a4f">Photo</div>`}
-${isNew(p.createdAt) ? `<div class="tag">Nouveau</div>` : ``}
-${images.length>1 ? `<div class="photos">📷 ${images.length}</div>` : ``}
-</div>
-<div class="body">
-<h3 class="name">${esc(p.name)}</h3>
-<div class="meta">${esc(p.category||"")} ${p.ref ? `• Réf: ${esc(p.ref)}` : ""}</div>
-<div class="meta">Tailles: <b>${esc(sizes.join(", ") || "—")}</b></div>
-<div class="desc">${esc(p.description||"")}</div>
-<div class="price">${dzd(p.priceDZD)}</div>
-<div class="btns">
-<button class="mini wa" type="button" onclick="openWhatsApp(${JSON.stringify(msg)})">WhatsApp</button>
-${images.length ? `<button class="mini view" type="button" onclick="openGallery('${p.key}')">Voir photos</button>` : ``}
-</div>
-</div>
-</div>`;
-}).join("");
-}
-
-function resetFilters(){
-searchEl.value="";
-catEl.value="all";
-sizeEl.value="all";
-sortEl.value="new";
-renderCatalogue();
-}
-
-searchEl.addEventListener("input", renderCatalogue);
-catEl.addEventListener("change", renderCatalogue);
-sizeEl.addEventListener("change", renderCatalogue);
-sortEl.addEventListener("change", renderCatalogue);
-
-/* ===== Galerie ===== */
-const galleryModal = document.getElementById("galleryModal");
-const gTitle = document.getElementById("gTitle");
-const gSub = document.getElementById("gSub");
-const gMain = document.getElementById("gMain");
-const gStrip = document.getElementById("gStrip");
-
-function openGallery(key){
-const p = ALL.find(x=>x.key===key);
-if(!p) return;
-const images = Array.isArray(p.images)?p.images:[];
-if(!images.length) return;
-
-gTitle.textContent = p.name || "Photos";
-gSub.textContent = `${dzd(p.priceDZD)} • ${images.length} photo(s)`;
-gMain.src = images[0];
-renderStrip(images, 0);
-galleryModal.classList.remove("hidden");
-}
-function renderStrip(images, active){
-gStrip.innerHTML = images.map((src,i)=>`
-<div class="thumb ${i===active?'active':''}" data-i="${i}">
-<img src="${esc(src)}" alt="photo ${i+1}">
-</div>
-`).join("");
-
-gStrip.querySelectorAll(".thumb").forEach(el=>{
-el.addEventListener("click", ()=>{
-const i = Number(el.getAttribute("data-i"));
-gMain.src = images[i];
-renderStrip(images, i);
-});
-});
-}
-function closeGallery(){
-galleryModal.classList.add("hidden");
-gMain.src="";
-gStrip.innerHTML="";
-}
-galleryModal.addEventListener("click", (e)=>{ if(e.target===galleryModal) closeGallery(); });
-
-/* ===== Admin (login + panel) ===== */
 const adminFab = document.getElementById("adminFab");
 const adminLoginModal = document.getElementById("adminLoginModal");
 const adminPanelModal = document.getElementById("adminPanelModal");
 const adminPass = document.getElementById("adminPass");
 const adminTable = document.getElementById("adminTable");
 
+// Admin open/close
 adminFab.addEventListener("click", ()=>{
 adminPass.value="";
 adminLoginModal.classList.remove("hidden");
@@ -1055,6 +1046,7 @@ setTimeout(()=>adminPass.focus(), 60);
 });
 function closeAdminLogin(){ adminLoginModal.classList.add("hidden"); }
 function closeAdminPanel(){ adminPanelModal.classList.add("hidden"); }
+
 adminLoginModal.addEventListener("click", (e)=>{ if(e.target===adminLoginModal) closeAdminLogin(); });
 adminPanelModal.addEventListener("click", (e)=>{ if(e.target===adminPanelModal) closeAdminPanel(); });
 
@@ -1063,14 +1055,14 @@ if(adminPass.value === ADMIN_PASSWORD){
 closeAdminLogin();
 adminPanelModal.classList.remove("hidden");
 renderAdminTable();
-}else alert("Mot de passe incorrect");
+}else{
+alert("Mot de passe incorrect");
+}
 }
 
-/* Admin form */
+// Form elements
 let EDIT_KEY = null;
-let existingImages = [];
-let removedExisting = new Set();
-let newImages = [];
+let imagesState = []; // final images array order (cover at index 0)
 
 const pName = document.getElementById("pName");
 const pPrice = document.getElementById("pPrice");
@@ -1080,25 +1072,20 @@ const pSizes = document.getElementById("pSizes");
 const pImages = document.getElementById("pImages");
 const pDesc = document.getElementById("pDesc");
 const thumbsAdmin = document.getElementById("thumbsAdmin");
-const editHint = document.getElementById("editHint");
 
+// Limits (gratuits)
 const MAX_IMAGES = 6;
 const MAX_BYTES_PER_IMAGE = 800 * 1024;
 
-function clearImageState(){
-existingImages = [];
-removedExisting = new Set();
-newImages = [];
-pImages.value="";
-renderAdminThumbs();
-}
 function clearForm(){
 EDIT_KEY = null;
 pName.value=""; pPrice.value=""; pCategory.value=""; pRef.value="";
 pSizes.value=""; pDesc.value="";
-editHint.textContent="";
-clearImageState();
+imagesState = [];
+pImages.value="";
+renderAdminThumbs();
 }
+
 function fillForm(p){
 EDIT_KEY = p.key;
 pName.value = p.name||"";
@@ -1107,13 +1094,15 @@ pCategory.value = p.category||"";
 pRef.value = p.ref||"";
 pSizes.value = (p.sizes||[]).join(",");
 pDesc.value = p.description||"";
-editHint.textContent = "✏️ Modification : " + (p.name||"");
-existingImages = Array.isArray(p.images)?p.images.slice():[];
-removedExisting = new Set();
-newImages = [];
+imagesState = Array.isArray(p.images) ? p.images.slice() : [];
 pImages.value="";
 renderAdminThumbs();
 }
+
+function parseSizesText(s){
+return String(s||"").split(",").map(x=>x.trim()).filter(Boolean);
+}
+
 function fileToDataURL(file){
 return new Promise((resolve,reject)=>{
 const r = new FileReader();
@@ -1122,17 +1111,14 @@ r.onload = ()=>resolve(r.result);
 r.readAsDataURL(file);
 });
 }
-function countAfter(){
-const kept = existingImages.filter((_,i)=>!removedExisting.has(i)).length;
-return kept + newImages.length;
-}
+
 pImages.addEventListener("change", async ()=>{
 const files = Array.from(pImages.files||[]);
 if(!files.length) return;
 
-let remaining = MAX_IMAGES - countAfter();
+const remaining = MAX_IMAGES - imagesState.length;
 if(remaining <= 0){
-alert(`Max ${MAX_IMAGES} photos. Retire une photo avant d’en ajouter.`);
+alert(`Max ${MAX_IMAGES} photos.`);
 pImages.value="";
 return;
 }
@@ -1146,124 +1132,116 @@ return;
 }
 }
 
+try{
 const dataUrls = await Promise.all(toRead.map(fileToDataURL));
-newImages.push(...dataUrls);
+imagesState.push(...dataUrls);
 pImages.value="";
 renderAdminThumbs();
+}catch(e){
+console.error(e);
+alert("Erreur lecture image.");
+}
 });
-function renderAdminThumbs(){
-const keptExisting = existingImages
-.map((src,idx)=>({src, type:"existing", idx}))
-.filter(x=>!removedExisting.has(x.idx));
-const added = newImages.map((src,idx)=>({src, type:"new", idx}));
-const all = [...keptExisting, ...added];
 
-if(!all.length){
+function renderAdminThumbs(){
+if(!imagesState.length){
 thumbsAdmin.innerHTML = `<div style="font-size:12px;color:rgba(0,0,0,.55)">Aucune photo.</div>`;
 return;
 }
-
-thumbsAdmin.innerHTML = all.map((x,pos)=>`
-<div class="thumbA" data-type="${x.type}" data-idx="${x.idx}" data-pos="${pos}">
-<img src="${esc(x.src)}" alt="photo">
+thumbsAdmin.innerHTML = imagesState.map((src,i)=>`
+<div class="thumbA" data-i="${i}">
+<img src="${esc(src)}" alt="photo">
 <div class="x">×</div>
-<div class="coverTag">${pos===0 ? "Couverture" : "Mettre couverture"}</div>
+<div class="coverTag">${i===0 ? "Couverture" : "Mettre couverture"}</div>
 </div>
 `).join("");
 
 thumbsAdmin.querySelectorAll(".thumbA").forEach(el=>{
 el.addEventListener("click", ()=>{
-const type = el.getAttribute("data-type");
-const idx = Number(el.getAttribute("data-idx"));
-const pos = Number(el.getAttribute("data-pos"));
-if(pos===0){ removeThumb(type, idx); }
-else{ makeCover(type, idx); }
+const i = Number(el.getAttribute("data-i"));
+// Si on clique sur la couverture -> supprimer
+// Sinon -> mettre en couverture
+if(i===0){
+if(confirm("Supprimer cette photo ?")){
+imagesState.splice(i,1);
+renderAdminThumbs();
+}
+}else{
+const chosen = imagesState[i];
+imagesState.splice(i,1);
+imagesState.unshift(chosen);
+renderAdminThumbs();
+}
 });
 });
 }
-function removeThumb(type, idx){
-if(type==="existing") removedExisting.add(idx);
-else newImages.splice(idx, 1);
-renderAdminThumbs();
-}
-function makeCover(type, idx){
-const keptExisting = existingImages.filter((_,i)=>!removedExisting.has(i));
-const keptNew = newImages.slice();
-let temp = [...keptExisting, ...keptNew];
 
-let targetSrc = (type==="existing") ? existingImages[idx] : newImages[idx];
-if(!targetSrc) return;
-
-temp = temp.filter(s => s !== targetSrc);
-temp.unshift(targetSrc);
-
-existingImages = temp;
-removedExisting = new Set();
-newImages = [];
-renderAdminThumbs();
-}
 function validateProduct(){
 const name = pName.value.trim();
 const category = pCategory.value.trim();
 const price = Number(pPrice.value);
 const ref = pRef.value.trim();
-const sizes = parseSizes(pSizes.value);
+const sizes = parseSizesText(pSizes.value);
 const desc = pDesc.value.trim();
+
 if(!name) return {ok:false, msg:"Nom obligatoire"};
 if(!category) return {ok:false, msg:"Catégorie obligatoire"};
 if(!Number.isFinite(price) || price<=0) return {ok:false, msg:"Prix invalide"};
-return {ok:true, data:{name, category, priceDZD:price, ref, sizes, description:desc}};
+if(imagesState.length===0) return {ok:false, msg:"Ajoute au moins une photo"};
+
+return {ok:true, data:{name, category, priceDZD:price, ref, sizes, description:desc, images: imagesState.slice(0,MAX_IMAGES)}};
 }
-function buildFinalImages(){
-const keptExisting = existingImages.filter((_,i)=>!removedExisting.has(i));
-return [...keptExisting, ...newImages].slice(0, MAX_IMAGES);
-}
+
 function saveProduct(){
 const v = validateProduct();
 if(!v.ok){ alert(v.msg); return; }
 
-const finalImages = buildFinalImages();
-if(finalImages.length===0){ alert("Ajoute au moins une photo."); return; }
-
+// createdAt (conserve si edit)
 const existing = EDIT_KEY ? ALL.find(x=>x.key===EDIT_KEY) : null;
-const payload = { ...v.data, images: finalImages, createdAt: existing?.createdAt || Date.now() };
+const payload = { ...v.data, createdAt: existing?.createdAt || Date.now() };
 
 if(EDIT_KEY){
-productsRef.child(EDIT_KEY).set(payload).then(()=>{
-alert("✅ Produit mis à jour !");
-clearForm();
-}).catch(err=>{ console.error(err); alert("❌ Erreur Firebase (rules ?)"); });
+productsRef.child(EDIT_KEY).set(payload)
+.then(()=>{ alert("✅ Produit mis à jour"); clearForm(); })
+.catch(err=>{ console.error(err); alert("❌ Erreur Firebase (rules ?)"); });
 }else{
-productsRef.push(payload).then(()=>{
-alert("✅ Produit ajouté !");
-clearForm();
-}).catch(err=>{ console.error(err); alert("❌ Erreur Firebase (rules ?)"); });
+productsRef.push(payload)
+.then(()=>{ alert("✅ Produit ajouté"); clearForm(); })
+.catch(err=>{ console.error(err); alert("❌ Erreur Firebase (rules ?)"); });
 }
 }
+
 function deleteProduct(key){
 if(!confirm("Supprimer ce produit ?")) return;
-productsRef.child(key).remove().catch(err=>{ console.error(err); alert("❌ Erreur suppression."); });
+productsRef.child(key).remove()
+.catch(err=>{ console.error(err); alert("❌ Erreur suppression"); });
 }
+
 function renderAdminTable(){
 if(adminPanelModal.classList.contains("hidden")) return;
+
 const rows = ALL.slice().sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
-if(!rows.length){ adminTable.innerHTML = `<tr><td colspan="5">Aucun produit.</td></tr>`; return; }
+if(!rows.length){
+adminTable.innerHTML = `<tr><td colspan="5">Aucun produit.</td></tr>`;
+return;
+}
 
 adminTable.innerHTML = rows.map(p=>{
-const photos = Array.isArray(p.images)?p.images.length:0;
+const photos = Array.isArray(p.images) ? p.images.length : 0;
 return `
 <tr>
 <td><b>${esc(p.name)}</b><div style="font-size:12px;color:rgba(0,0,0,.55)">${p.ref?("Réf: "+esc(p.ref)):""}</div></td>
-<td>${esc(dzd(p.priceDZD))}</td>
+<td>${esc(formatPrice(p.priceDZD))}</td>
 <td>${esc(p.category||"")}</td>
-<td>${photos?("📷 "+photos):"—"}</td>
+<td>${photos ? ("📷 "+photos) : "—"}</td>
 <td>
 <div class="rowBtns">
 <button class="btnSmall" type="button" data-edit="${p.key}">Modifier</button>
 <button class="btnSmall danger" type="button" data-del="${p.key}">Supprimer</button>
 </div>
 </td>
-</tr>`;
+</tr>
+`;
 }).join("");
 
 adminTable.querySelectorAll("[data-edit]").forEach(btn=>{
@@ -1280,7 +1258,10 @@ deleteProduct(btn.getAttribute("data-del"));
 });
 }
 
-/* ===== Live Firebase sync ===== */
+//////////////////////////////////////
+// SYNC FIREBASE LIVE -> ALL + UI
+//////////////////////////////////////
+
 productsRef.on("value", (snap)=>{
 const items = [];
 snap.forEach(child=>{
@@ -1298,10 +1279,132 @@ createdAt: Number(v.createdAt||0)
 });
 });
 ALL = items;
+
+// refresh UI
 buildFilterOptions();
 renderCatalogue();
 renderAdminTable();
 });
+
+// Init admin thumbs
+renderAdminThumbs();
 </script>
+<script>
+//////////////////////////////////////
+// CURSEUR LUMINEUX
+//////////////////////////////////////
+
+const spark = document.getElementById("spark");
+window.addEventListener("mousemove", (e)=>{
+if(!spark) return;
+spark.style.opacity = "1";
+spark.style.left = e.clientX + "px";
+spark.style.top = e.clientY + "px";
+});
+window.addEventListener("mouseleave", ()=>{
+if(!spark) return;
+spark.style.opacity = "0";
+});
+
+//////////////////////////////////////
+// PETIT COIN ARABE (RESET 24H + AMIN)
+//////////////////////////////////////
+
+const ARABIC_DAILY = [
+{ text: "﴿ وَقَالَ رَبُّكُمُ ادْعُونِي أَسْتَجِبْ لَكُمْ ﴾", source: "القرآن الكريم", ref: "غافر: ٦٠" },
+{ text: "﴿ إِنَّ مَعَ الْعُسْرِ يُسْرًا ﴾", source: "القرآن الكريم", ref: "الشرح: ٦" },
+{ text: "اللَّهُمَّ إِنِّي أَسْأَلُكَ الْعَفْوَ وَالْعَافِيَةَ", source: "دعاء", ref: "" },
+{ text: "رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً وَفِي الْآخِرَةِ حَسَنَةً وَقِنَا عَذَابَ النَّارِ", source: "القرآن الكريم", ref: "البقرة: ٢٠١" },
+{ text: "سُبْحَانَ اللَّهِ وَبِحَمْدِهِ، سُبْحَانَ اللَّهِ الْعَظِيمِ", source: "صحيح البخاري", ref: "حديث" }
+];
+
+function dayKey(){
+const d = new Date();
+const y = d.getFullYear();
+const m = String(d.getMonth()+1).padStart(2,"0");
+const da = String(d.getDate()).padStart(2,"0");
+return `${y}-${m}-${da}`;
+}
+
+function arabicDate(){
+return new Date().toLocaleDateString("ar-DZ", {
+weekday:"long", year:"numeric", month:"long", day:"numeric"
+});
+}
+
+function setDailyArabic(index){
+const item = ARABIC_DAILY[index % ARABIC_DAILY.length];
+const t = document.getElementById("arabicText");
+const m = document.getElementById("arabicMeta");
+
+if(t) t.textContent = item.text;
+
+if(m){
+const src = item.source ? `المصدر: ${item.source}` : "";
+const ref = item.ref ? ` • ${item.ref}` : "";
+m.textContent = `${src}${ref} • ${arabicDate()}`;
+}
+
+localStorage.setItem("ar_daily_day", dayKey());
+localStorage.setItem("ar_daily_index", String(index));
+}
+
+function initDailyArabic(){
+const today = dayKey();
+const savedDay = localStorage.getItem("ar_daily_day");
+
+if(savedDay !== today){
+// nouvelle journée => tirage random
+const idx = Math.floor(Math.random() * ARABIC_DAILY.length);
+setDailyArabic(idx);
+localStorage.removeItem("amin_clicked_day");
+}else{
+const idx = Number(localStorage.getItem("ar_daily_index") || "0");
+setDailyArabic(idx);
+}
+refreshAminButton();
+}
+
+function nextArabicDaily(){
+const idx = Number(localStorage.getItem("ar_daily_index") || "0") + 1;
+setDailyArabic(idx);
+refreshAminButton();
+}
+
+function refreshAminButton(){
+const btn = document.getElementById("aminBtn");
+if(!btn) return;
+
+if(localStorage.getItem("amin_clicked_day") === dayKey()){
+btn.disabled = true;
+btn.textContent = "تم ✅";
+}else{
+btn.disabled = false;
+btn.textContent = "آمين 🤲";
+}
+}
+
+function sayAminDaily(){
+if(localStorage.getItem("amin_clicked_day") === dayKey()){
+refreshAminButton();
+return;
+}
+localStorage.setItem("amin_clicked_day", dayKey());
+refreshAminButton();
+}
+
+document.addEventListener("DOMContentLoaded", initDailyArabic);
+</script>
+<script>
+//////////////////////////////////////
+// ANTI-BUG CACHE GITHUB (FACULTATIF)
+//////////////////////////////////////
+// Si GitHub Pages te sert un ancien index.html,
+// ajoute ?v=1 à l’URL pour forcer le refresh.
+// Exemple : https://tonsite.github.io/?v=2
+
+console.log("MA NESS chargé ✅", new Date().toISOString());
+</script>
+
 </body>
 </html>
