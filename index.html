@@ -23,7 +23,7 @@ overflow-x:hidden;
 background: linear-gradient(180deg, var(--rose2), #fff);
 }
 
-/* Fond clair + image + animation douce (pas noir) */
+/* Fond doux + animation */
 .bg{
 position: fixed;
 inset:0;
@@ -59,6 +59,21 @@ pointer-events:none;
 @keyframes mist{
 from{ transform: translate3d(-1.5%, -1%, 0); opacity:.45; }
 to{ transform: translate3d(1.5%, 1%, 0); opacity:.62; }
+}
+
+/* Effet curseur lumineux (souris) */
+.spark{
+position: fixed;
+width: 14px;
+height: 14px;
+border-radius: 50%;
+pointer-events:none;
+transform: translate(-50%, -50%);
+background: radial-gradient(circle, rgba(201,173,106,0.95), rgba(247,198,215,0.25), transparent 70%);
+box-shadow: 0 0 20px rgba(201,173,106,.55), 0 0 35px rgba(247,198,215,.35);
+opacity: 0;
+z-index: 999;
+transition: opacity .15s ease;
 }
 
 /* Intro 5s */
@@ -303,7 +318,7 @@ color:#2a1024;
 .mini.wa{ background: linear-gradient(90deg, rgba(247,198,215,.95), rgba(201,173,106,.70)); color:#2a1024; }
 .mini.view{ background:#fff; border:1px solid rgba(0,0,0,.08); color:#5c2a4f; }
 
-/* Admin FAB */
+/* Admin bouton */
 .adminFab{
 position: fixed;
 right: 16px;
@@ -475,6 +490,75 @@ cursor:pointer;
 background: linear-gradient(90deg, rgba(255,120,120,.95), rgba(255,195,195,.92));
 border: 0;
 }
+
+/* ===== Petit coin (ARABE uniquement) : reset 24h + source + date ===== */
+.arabicCorner{
+margin-top: 12px;
+display:flex;
+justify-content:flex-end;
+}
+.arabicCard{
+width: min(360px, 100%);
+border-radius: 20px;
+background: rgba(255,255,255,.62);
+border: 1px solid rgba(255,255,255,.85);
+backdrop-filter: blur(10px);
+box-shadow: 0 14px 40px rgba(0,0,0,.10);
+padding: 12px 12px 10px;
+direction: rtl;
+text-align: right;
+}
+.arabicTitle{
+font-weight: 900;
+color:#5c2a4f;
+font-size: 13px;
+display:flex;
+align-items:center;
+justify-content:space-between;
+gap:8px;
+}
+.arabicText{
+margin-top: 8px;
+font-size: 14px;
+line-height: 1.7;
+font-weight: 800;
+color:#2a1024;
+}
+.arabicSub{
+margin-top: 8px;
+font-size: 12px;
+color: rgba(92,42,79,.75);
+font-weight: 900;
+}
+.arabicActions{
+display:flex;
+gap:10px;
+flex-wrap:wrap;
+margin-top: 10px;
+direction: rtl;
+}
+.aminBtn{
+padding: 10px 14px;
+border-radius: 16px;
+border: 0;
+cursor:pointer;
+font-weight: 1000;
+background: linear-gradient(90deg, rgba(247,198,215,.95), rgba(201,173,106,.70));
+color:#2a1024;
+}
+.nextBtn{
+padding: 10px 14px;
+border-radius: 16px;
+border: 1px solid rgba(0,0,0,.10);
+cursor:pointer;
+font-weight: 1000;
+background: rgba(255,255,255,.80);
+color:#5c2a4f;
+}
+.aminBtn:disabled{
+opacity: .75;
+cursor: not-allowed;
+}
 </style>
 
 <!-- Firebase compat (OK GitHub Pages) -->
@@ -485,6 +569,7 @@ border: 0;
 <body>
 <div class="bg"></div>
 <div class="mist"></div>
+<div class="spark" id="spark"></div>
 
 <!-- Intro -->
 <div class="intro" id="intro">
@@ -517,7 +602,25 @@ Catalogue élégant, contact direct sur WhatsApp, paiement sur place.
 <b>Livraison : Ouled Rechache + villes proches</b>.
 </p>
 <div class="pill">MA NESS — L’élégance qui parle doucement.</div>
-<div class="pill" style="margin-left:8px;">🔊 Cliquez n’importe où pour lancer la récitation</div>
+<div class="pill" style="margin-left:8px;">🔊 Cliquez n’importe où : récitation au 1er clic</div>
+
+<!-- Petit coin arabe (petit) -->
+<div class="arabicCorner">
+<div class="arabicCard" aria-label="ركن دعاء اليوم" dir="rtl" lang="ar">
+<div class="arabicTitle">
+<span>🌙 دعاء اليوم</span>
+<span style="font-size:12px;color:rgba(92,42,79,.75);font-weight:900;">يتجدّد كل 24 ساعة</span>
+</div>
+
+<div class="arabicText" id="arabicText">...</div>
+<div class="arabicSub" id="arabicMeta"></div>
+
+<div class="arabicActions">
+<button class="aminBtn" id="aminBtn" type="button" onclick="sayAminDaily()">آمين 🤲</button>
+<button class="nextBtn" type="button" onclick="nextArabicDaily()">ذكر آخر</button>
+</div>
+</div>
+</div>
 </section>
 
 <section class="catalog">
@@ -668,6 +771,15 @@ const ADMIN_PASSWORD = "MN@Ness#7281";
 /* ===== INTRO 5s ===== */
 setTimeout(()=> document.getElementById("intro").classList.add("hide"), 5000);
 
+/* ===== Curseur lumineux ===== */
+const spark = document.getElementById("spark");
+window.addEventListener("mousemove", (e)=>{
+spark.style.opacity = "1";
+spark.style.left = e.clientX + "px";
+spark.style.top = e.clientY + "px";
+});
+window.addEventListener("mouseleave", ()=> spark.style.opacity = "0");
+
 /* ===== Firebase config (compat) ===== */
 const firebaseConfig = {
 apiKey: "AIzaSyCQf9NiEsz9-_Bv_OE9GsxjvKBCD1CFMXs",
@@ -682,39 +794,117 @@ firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 const productsRef = db.ref("products");
 
-/* ===== RÉCITATION : AU PREMIER CLIC N’IMPORTE OÙ (PC + TEL) =====
-⚠️ Les navigateurs bloquent l’audio auto. Au 1er clic/tap, ça marche.
+/* ===== RÉCITATION : démarre au 1er clic/tap (FIABLE) =====
+⚠️ Mets "sourate.mp3" à côté de "index.html"
 */
 let recitation;
-let startedOnce = false;
+let recitationStarted = false;
 
 function initRecitation(){
 if(recitation) return;
-recitation = new Audio("sourate.mp3"); // 🔥 mets sourate.mp3 à côté de index.html
+const mp3Url = new URL("./sourate.mp3", window.location.href).href;
+recitation = new Audio(mp3Url);
 recitation.loop = false;
 recitation.volume = 0.65;
 recitation.preload = "auto";
 }
 
-async function startOnFirstClick(){
-if(startedOnce) return;
-startedOnce = true;
-
+async function tryStartRecitation(){
+if(recitationStarted) return;
 try{
 initRecitation();
 await recitation.play();
+recitationStarted = true;
+window.removeEventListener("pointerdown", tryStartRecitation);
+window.removeEventListener("keydown", tryStartRecitation);
 }catch(e){
-// si bloqué, on autorise un autre essai
-startedOnce = false;
+console.log("Recitation not started yet, retry on next click:", e);
 }
 }
-document.addEventListener("click", startOnFirstClick, { once: true });
-document.addEventListener("touchstart", startOnFirstClick, { once: true });
+window.addEventListener("pointerdown", tryStartRecitation);
+window.addEventListener("keydown", tryStartRecitation);
 
-/* ===== Utils ===== */
-const MAX_IMAGES = 6;
-const MAX_BYTES_PER_IMAGE = 800 * 1024;
+/* ===== Petit coin ARABE : reset 24h + source + date + آمين 1 fois/jour ===== */
+const ARABIC_DAILY = [
+{ text: "﴿ وَقَالَ رَبُّكُمُ ادْعُونِي أَسْتَجِبْ لَكُمْ ﴾", source: "القرآن الكريم", ref: "غافر: ٦٠" },
+{ text: "﴿ إِنَّ مَعَ الْعُسْرِ يُسْرًا ﴾", source: "القرآن الكريم", ref: "الشرح: ٦" },
+{ text: "اللَّهُمَّ إِنِّي أَسْأَلُكَ الْعَفْوَ وَالْعَافِيَةَ", source: "دعاء", ref: "" },
+{ text: "رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً وَفِي الْآخِرَةِ حَسَنَةً وَقِنَا عَذَابَ النَّارِ", source: "القرآن الكريم", ref: "البقرة: ٢٠١" },
+{ text: "سُبْحَانَ اللَّهِ وَبِحَمْدِهِ، سُبْحَانَ اللَّهِ الْعَظِيمِ", source: "صحيح البخاري", ref: "حديث" }
+];
 
+function dayKey(){
+const d = new Date();
+const y = d.getFullYear();
+const m = String(d.getMonth()+1).padStart(2,"0");
+const da = String(d.getDate()).padStart(2,"0");
+return `${y}-${m}-${da}`;
+}
+function arabicDate(){
+return new Date().toLocaleDateString("ar-DZ", { weekday:"long", year:"numeric", month:"long", day:"numeric" });
+}
+
+function setDailyArabic(index){
+const item = ARABIC_DAILY[index % ARABIC_DAILY.length];
+const t = document.getElementById("arabicText");
+const m = document.getElementById("arabicMeta");
+if(t) t.textContent = item.text;
+if(m){
+const src = item.source ? `المصدر: ${item.source}` : "";
+const ref = item.ref ? ` • ${item.ref}` : "";
+m.textContent = `${src}${ref} • ${arabicDate()}`;
+}
+localStorage.setItem("ar_daily_day", dayKey());
+localStorage.setItem("ar_daily_index", String(index));
+}
+
+function initDailyArabic(){
+const today = dayKey();
+const savedDay = localStorage.getItem("ar_daily_day");
+
+if(savedDay !== today){
+// nouvelle journée -> nouvelle douaa / verset
+const idx = Math.floor(Math.random() * ARABIC_DAILY.length);
+setDailyArabic(idx);
+// reset du bouton آمين
+localStorage.removeItem("amin_clicked_day");
+}else{
+const idx = Number(localStorage.getItem("ar_daily_index") || "0");
+setDailyArabic(idx);
+}
+refreshAminButton();
+}
+
+function nextArabicDaily(){
+const idx = Number(localStorage.getItem("ar_daily_index") || "0") + 1;
+setDailyArabic(idx);
+refreshAminButton();
+}
+
+function refreshAminButton(){
+const btn = document.getElementById("aminBtn");
+if(!btn) return;
+if(localStorage.getItem("amin_clicked_day") === dayKey()){
+btn.disabled = true;
+btn.textContent = "تم ✅";
+}else{
+btn.disabled = false;
+btn.textContent = "آمين 🤲";
+}
+}
+
+function sayAminDaily(){
+if(localStorage.getItem("amin_clicked_day") === dayKey()){
+refreshAminButton();
+return;
+}
+localStorage.setItem("amin_clicked_day", dayKey());
+refreshAminButton();
+}
+
+document.addEventListener("DOMContentLoaded", initDailyArabic);
+
+/* ===== Utils boutique ===== */
 function openWhatsApp(prefill){
 const msg = prefill ? ("?text=" + encodeURIComponent(prefill)) : "";
 window.open("https://wa.me/" + SHOP_PHONE + msg, "_blank");
@@ -726,6 +916,10 @@ return String(s ?? "").replace(/[&<>"']/g, m => ({ "&":"&amp;","<":"&lt;",">":"&
 function dzd(n){ return Number(n||0).toLocaleString("fr-FR") + " DZD"; }
 function parseSizes(s){ return String(s||"").split(",").map(x=>x.trim()).filter(Boolean); }
 function unique(arr){ return Array.from(new Set(arr)); }
+function isNew(createdAt){
+const days = 5;
+return createdAt && (Date.now() - createdAt) < (days*24*60*60*1000);
+}
 
 /* ===== Catalogue state ===== */
 let ALL = [];
@@ -735,11 +929,6 @@ const searchEl = document.getElementById("search");
 const catEl = document.getElementById("cat");
 const sizeEl = document.getElementById("size");
 const sortEl = document.getElementById("sort");
-
-function isNew(createdAt){
-const days = 5;
-return createdAt && (Date.now() - createdAt) < (days*24*60*60*1000);
-}
 
 function buildFilterOptions(){
 const cats = unique(ALL.map(p=>p.category).filter(Boolean)).sort((a,b)=>a.localeCompare(b,"fr"));
@@ -871,11 +1060,12 @@ gStrip.innerHTML="";
 }
 galleryModal.addEventListener("click", (e)=>{ if(e.target===galleryModal) closeGallery(); });
 
-/* ===== Admin ===== */
+/* ===== Admin (login + panel) ===== */
 const adminFab = document.getElementById("adminFab");
 const adminLoginModal = document.getElementById("adminLoginModal");
 const adminPanelModal = document.getElementById("adminPanelModal");
 const adminPass = document.getElementById("adminPass");
+const adminTable = document.getElementById("adminTable");
 
 adminFab.addEventListener("click", ()=>{
 adminPass.value="";
@@ -913,7 +1103,9 @@ const pImages = document.getElementById("pImages");
 const pDesc = document.getElementById("pDesc");
 const thumbsAdmin = document.getElementById("thumbsAdmin");
 const editHint = document.getElementById("editHint");
-const adminTable = document.getElementById("adminTable");
+
+const MAX_IMAGES = 6;
+const MAX_BYTES_PER_IMAGE = 800 * 1024;
 
 function clearImageState(){
 existingImages = [];
@@ -1142,6 +1334,21 @@ buildFilterOptions();
 renderCatalogue();
 renderAdminTable();
 });
+
+/* ===== Filter options ===== */
+function buildFilterOptions(){
+const cats = unique(ALL.map(p=>p.category).filter(Boolean)).sort((a,b)=>a.localeCompare(b,"fr"));
+const sizes = unique(ALL.flatMap(p=>Array.isArray(p.sizes)?p.sizes:[]).filter(Boolean)).sort();
+
+const prevCat = catEl.value || "all";
+const prevSize = sizeEl.value || "all";
+
+catEl.innerHTML = `<option value="all">Toutes catégories</option>` + cats.map(c=>`<option value="${esc(c)}">${esc(c)}</option>`).join("");
+sizeEl.innerHTML = `<option value="all">Toutes tailles</option>` + sizes.map(s=>`<option value="${esc(s)}">${esc(s)}</option>`).join("");
+
+if([...catEl.options].some(o=>o.value===prevCat)) catEl.value = prevCat;
+if([...sizeEl.options].some(o=>o.value===prevSize)) sizeEl.value = prevSize;
+}
 </script>
 </body>
 </html>
